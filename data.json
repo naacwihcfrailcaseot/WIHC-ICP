@@ -34,5 +34,17 @@
     "status": "active",
     "createdAt": "2026-08-31T08:12:04.303Z",
     "updatedAt": "2026-08-31T08:12:04.303Z"
+  },
+  {
+    "id": "mtgynv3fm4n2mr",
+    "name": "C秀奎",
+    "admissionDate": "2019-11-21",
+    "icpDate": "2025-11-05",
+    "cognitive": "Major NCD",
+    "otTraining": "Yes",
+    "gerontech": "No",
+    "status": "active",
+    "createdAt": "2026-08-31T08:12:57.003Z",
+    "updatedAt": "2026-08-31T08:12:57.003Z"
   }
 ]
