@@ -466,5 +466,29 @@
     "status": "active",
     "createdAt": "2026-08-31T08:43:58.019Z",
     "updatedAt": "2026-08-31T08:43:58.019Z"
+  },
+  {
+    "id": "mtgzsdws1n04au",
+    "name": "K惠良",
+    "admissionDate": "2025-01-06",
+    "icpDate": "2025-12-31",
+    "cognitive": "Normal",
+    "otTraining": "No",
+    "gerontech": "No",
+    "status": "active",
+    "createdAt": "2026-08-31T08:44:27.628Z",
+    "updatedAt": "2026-08-31T08:44:27.628Z"
+  },
+  {
+    "id": "mtgzt9llnj3jw5",
+    "name": "L美賢",
+    "admissionDate": "2025-01-06",
+    "icpDate": "2026-01-15",
+    "cognitive": "Normal",
+    "otTraining": "No",
+    "gerontech": "No",
+    "status": "active",
+    "createdAt": "2026-08-31T08:45:08.697Z",
+    "updatedAt": "2026-08-31T08:45:08.697Z"
   }
 ]
