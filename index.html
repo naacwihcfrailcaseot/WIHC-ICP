@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>個案資料庫 Case Database</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #f0f4f8;
+      --card: #ffffff;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background: var(--bg);
+      color: #1e293b;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #1e40af, #3b82f6);
+      color: white;
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    header h1 { font-size: 1.5rem; font-weight: 700; }
+    header p { opacity: 0.9; font-size: 0.9rem; margin-top: 0.25rem; }
+    .header-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; }
+    .sync-status {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.85rem; background: rgba(255,255,255,0.15);
+      padding: 0.35rem 0.75rem; border-radius: 999px;
+    }
+    .sync-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #94a3b8;
+    }
+    .sync-dot.ok { background: #4ade80; }
+    .sync-dot.syncing { background: #fbbf24; animation: pulse 1s infinite; }
+    .sync-dot.err { background: #f87171; }
+    .sync-dot.local { background: #94a3b8; }
+    @keyframes pulse { 50% { opacity: 0.4; } }
+    .container { max-width: 1400px; margin: 0 auto; padding: 1.25rem; }
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .stat-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    .stat-card .num { font-size: 1.75rem; font-weight: 700; color: var(--primary); }
+    .stat-card .label { font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem; }
+    .stat-card.warning .num { color: var(--warning); }
+    .stat-card.danger .num { color: var(--danger); }
+    .stat-card.success .num { color: var(--success); }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    @media (max-width: 1024px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 0.9rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8fafc;
+    }
+    .card-body { padding: 1.25rem; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.9rem;
+    }
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+    .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 0.85rem; font-weight: 500; color: #334155; }
+    input, select {
+      padding: 0.55rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .btn-row { display: flex; gap: 0.6rem; margin-top: 1rem; flex-wrap: wrap; }
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      padding: 0.55rem 1.1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background 0.15s, transform 0.1s;
+    }
+    button:active { transform: scale(0.98); }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+    .btn-secondary { background: #e2e8f0; color: #334155; }
+    .btn-secondary:hover:not(:disabled) { background: #cbd5e1; }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover:not(:disabled) { background: #15803d; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover:not(:disabled) { background: #b91c1c; }
+    .btn-warning { background: var(--warning); color: white; }
+    .btn-warning:hover:not(:disabled) { background: #b45309; }
+    .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+    .charts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    @media (max-width: 900px) {
+      .charts { grid-template-columns: 1fr; }
+    }
+    .chart-wrap {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      height: 280px;
+      position: relative;
+    }
+    .chart-wrap h3 {
+      font-size: 0.95rem;
+      text-align: center;
+      margin-bottom: 0.5rem;
+      color: #334155;
+    }
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    th, td {
+      padding: 0.65rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    th {
+      background: #f1f5f9;
+      font-weight: 600;
+      color: #475569;
+      position: sticky;
+      top: 0;
+    }
+    tr:hover td { background: #f8fafc; }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-normal { background: #dcfce7; color: #166534; }
+    .badge-mci { background: #fef9c3; color: #854d0e; }
+    .badge-major { background: #ffedd5; color: #9a3412; }
+    .badge-dementia { background: #fee2e2; color: #991b1b; }
+    .badge-yes { background: #dbeafe; color: #1e40af; }
+    .badge-no { background: #f1f5f9; color: #64748b; }
+    .badge-due { background: #fef3c7; color: #92400e; }
+    .badge-overdue { background: #fee2e2; color: #991b1b; }
+    .badge-ok { background: #dcfce7; color: #166534; }
+    .badge-discharged { background: #e2e8f0; color: #475569; }
+    .filters {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .filters select, .filters input {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.85rem;
+    }
+    .empty {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+    }
+    .alert-box {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.9rem;
+      color: #9a3412;
+    }
+    .alert-box strong { color: #c2410c; }
+    .alert-box ul { margin: 0.4rem 0 0 1.2rem; }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: white;
+      border-radius: 12px;
+      max-width: 480px;
+      width: 100%;
+      padding: 1.5rem;
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.15);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal h3 { margin-bottom: 0.75rem; }
+    .modal p { color: #475569; margin-bottom: 1rem; font-size: 0.95rem; }
+    .modal .btn-row { justify-content: flex-end; }
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: #1e293b;
+      color: white;
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      z-index: 200;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.25s;
+      pointer-events: none;
+      max-width: 320px;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .caseload-bar {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.4rem;
+    }
+    .caseload-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+    .caseload-fill.near { background: var(--warning); }
+    .caseload-fill.full { background: var(--danger); }
+    .config-banner {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.9rem;
+      color: #1e40af;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .config-banner.hidden { display: none; }
+    .hint { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+    .danger-hint { font-size: 0.8rem; color: var(--danger); margin-top: 0.35rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-row">
+      <div>
+        <h1>個案資料庫 Case Database</h1>
+        <p>最高服務量 70 人 · 每年 ICP 覆核 · 覆核期限前一個月必須完成</p>
+      </div>
+      <div class="sync-status" id="syncStatus">
+        <span class="sync-dot local" id="syncDot"></span>
+        <span id="syncLabel">本機模式</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="config-banner" id="configBanner">
+      <span>尚未連接 GitHub。資料只存在此瀏覽器。點擊設定以啟用多人同步。</span>
+      <button type="button" class="btn-primary btn-sm" onclick="openConfig()">設定 GitHub 同步</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="num" id="statActive">0</div>
+        <div class="label">在籍個案 / 70</div>
+        <div class="caseload-bar"><div class="caseload-fill" id="caseloadFill" style="width:0%"></div></div>
+      </div>
+      <div class="stat-card success">
+        <div class="num" id="statOk">0</div>
+        <div class="label">覆核正常</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="num" id="statDue">0</div>
+        <div class="label">一個月內須覆核</div>
+      </div>
+      <div class="stat-card danger">
+        <div class="num" id="statOverdue">0</div>
+        <div class="label">已過期未覆核</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="statDischarged">0</div>
+        <div class="label">已離院總數</div>
+      </div>
+    </div>
+
+    <div id="alertBox" class="alert-box" style="display:none;"></div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span id="formTitle">新增個案</span>
+          <button type="button" class="btn-secondary btn-sm" id="btnCancelEdit" style="display:none;" onclick="cancelEdit()">取消編輯</button>
+        </div>
+        <div class="card-body">
+          <form id="caseForm">
+            <input type="hidden" id="editId" />
+            <div class="form-grid">
+              <div class="form-group full">
+                <label for="caseName">個案姓名 Case Name *</label>
+                <input type="text" id="caseName" required placeholder="例如：陳大文" />
+              </div>
+              <div class="form-group">
+                <label for="admissionDate">入會月份日期 *</label>
+                <input type="date" id="admissionDate" required />
+              </div>
+              <div class="form-group">
+                <label for="icpDate">ICP Date *</label>
+                <input type="date" id="icpDate" required />
+              </div>
+              <div class="form-group">
+                <label for="cognitive">Cognitive Level *</label>
+                <select id="cognitive" required>
+                  <option value="Normal">Normal</option>
+                  <option value="MCI">MCI</option>
+                  <option value="Major NCD">Major NCD</option>
+                  <option value="Dementia">Dementia</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="otTraining">OT Training *</label>
+                <select id="otTraining" required>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="gerontech">使用 Gerontech *</label>
+                <select id="gerontech" required>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button type="submit" class="btn-primary" id="btnSubmit">儲存個案</button>
+              <button type="button" class="btn-secondary" onclick="resetForm()">清空</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>個案列表</span>
+          <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+            <button type="button" class="btn-secondary btn-sm" onclick="pullFromGitHub()" title="從 GitHub 重新載入">重新同步</button>
+            <button type="button" class="btn-secondary btn-sm" onclick="openConfig()">GitHub 設定</button>
+            <button type="button" class="btn-secondary btn-sm" onclick="exportCSV()">匯出 CSV</button>
+            <button type="button" class="btn-secondary btn-sm" onclick="document.getElementById('importFile').click()">匯入 CSV</button>
+            <input type="file" id="importFile" accept=".csv" style="display:none;" onchange="importCSV(event)" />
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="filters">
+            <select id="filterStatus" onchange="renderTable()">
+              <option value="active">只顯示在籍</option>
+              <option value="all">全部</option>
+              <option value="discharged">只顯示已離院</option>
+              <option value="due">須覆核 / 已過期</option>
+            </select>
+            <select id="filterCognitive" onchange="renderTable()">
+              <option value="">全部認知水平</option>
+              <option value="Normal">Normal</option>
+              <option value="MCI">MCI</option>
+              <option value="Major NCD">Major NCD</option>
+              <option value="Dementia">Dementia</option>
+            </select>
+            <input type="text" id="searchName" placeholder="搜尋姓名…" oninput="renderTable()" style="min-width:140px;" />
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>姓名</th>
+                  <th>入會日期</th>
+                  <th>ICP Date</th>
+                  <th>下次覆核期限</th>
+                  <th>覆核狀態</th>
+                  <th>認知</th>
+                  <th>OT</th>
+                  <th>Gerontech</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="caseTableBody"></tbody>
+            </table>
+            <div id="emptyMsg" class="empty" style="display:none;">暫無個案資料</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts">
+      <div class="chart-wrap">
+        <h3>Cognitive Level</h3>
+        <canvas id="chartCognitive"></canvas>
+      </div>
+      <div class="chart-wrap">
+        <h3>OT Training</h3>
+        <canvas id="chartOT"></canvas>
+      </div>
+      <div class="chart-wrap">
+        <h3>使用 Gerontech</h3>
+        <canvas id="chartGerontech"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <h3 id="modalTitle">確認</h3>
+      <p id="modalMsg"></p>
+      <div class="btn-row">
+        <button type="button" class="btn-secondary" onclick="closeModal()">取消</button>
+        <button type="button" class="btn-primary" id="modalConfirm">確認</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Config modal -->
+  <div class="modal-overlay" id="configModal">
+    <div class="modal">
+      <h3>GitHub 同步設定</h3>
+      <p>資料會寫入你 repo 內的 JSON 檔。Token 只存在此瀏覽器，不會上傳到 GitHub 頁面本身。</p>
+      <div class="form-grid" style="margin-bottom:0.75rem;">
+        <div class="form-group full">
+          <label>GitHub 用戶名 / 組織名 *</label>
+          <input type="text" id="cfgOwner" placeholder="your-username" />
+        </div>
+        <div class="form-group full">
+          <label>Repository 名稱 *</label>
+          <input type="text" id="cfgRepo" placeholder="case-database" />
+        </div>
+        <div class="form-group">
+          <label>Branch</label>
+          <input type="text" id="cfgBranch" placeholder="main" value="main" />
+        </div>
+        <div class="form-group">
+          <label>JSON 檔路徑</label>
+          <input type="text" id="cfgPath" placeholder="data.json" value="data.json" />
+        </div>
+        <div class="form-group full">
+          <label>Personal Access Token (PAT) *</label>
+          <input type="password" id="cfgToken" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off" />
+          <div class="hint">需要 <code>repo</code> 權限（經典 token）或 Contents: Read &amp; Write（fine-grained）。</div>
+          <div class="danger-hint">⚠ Token 有寫入權限，請勿分享此電腦給不可信的人。建議用 fine-grained token 並只授權這一個 repo。</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn-secondary" onclick="closeConfig()">取消</button>
+        <button type="button" class="btn-danger btn-sm" onclick="clearConfig()" title="清除本機設定">清除設定</button>
+        <button type="button" class="btn-primary" onclick="saveConfig()">儲存並連接</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const MAX_CASELOAD = 70;
+    const LOCAL_KEY = 'ot_case_db_v1';
+    const CONFIG_KEY = 'ot_case_db_gh_config';
+
+    let cases = [];
+    let charts = { cognitive: null, ot: null, gerontech: null };
+    let pendingAction = null;
+    let fileSha = null;          // GitHub blob SHA for updates
+    let syncEnabled = false;
+    let saving = false;
+
+    // ---------- Config ----------
+    function getConfig() {
+      try {
+        return JSON.parse(localStorage.getItem(CONFIG_KEY) || 'null');
+      } catch { return null; }
+    }
+
+    function setConfig(cfg) {
+      if (cfg) localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+      else localStorage.removeItem(CONFIG_KEY);
+    }
+
+    function openConfig() {
+      const cfg = getConfig() || {};
+      document.getElementById('cfgOwner').value = cfg.owner || '';
+      document.getElementById('cfgRepo').value = cfg.repo || '';
+      document.getElementById('cfgBranch').value = cfg.branch || 'main';
+      document.getElementById('cfgPath').value = cfg.path || 'data.json';
+      document.getElementById('cfgToken').value = cfg.token || '';
+      document.getElementById('configModal').classList.add('show');
+    }
+
+    function closeConfig() {
+      document.getElementById('configModal').classList.remove('show');
+    }
+
+    function clearConfig() {
+      setConfig(null);
+      syncEnabled = false;
+      fileSha = null;
+      updateSyncUI('local', '本機模式');
+      document.getElementById('configBanner').classList.remove('hidden');
+      closeConfig();
+      toast('已清除 GitHub 設定，改回本機儲存');
+    }
+
+    async function saveConfig() {
+      const owner = document.getElementById('cfgOwner').value.trim();
+      const repo = document.getElementById('cfgRepo').value.trim();
+      const branch = document.getElementById('cfgBranch').value.trim() || 'main';
+      const path = document.getElementById('cfgPath').value.trim() || 'data.json';
+      const token = document.getElementById('cfgToken').value.trim();
+      if (!owner || !repo || !token) {
+        toast('請填寫用戶名、Repo 與 Token');
+        return;
+      }
+      setConfig({ owner, repo, branch, path, token });
+      closeConfig();
+      toast('設定已儲存，正在連接…');
+      await pullFromGitHub();
+    }
+
+    // ---------- Sync UI ----------
+    function updateSyncUI(state, label) {
+      const dot = document.getElementById('syncDot');
+      const lab = document.getElementById('syncLabel');
+      dot.className = 'sync-dot ' + state;
+      lab.textContent = label;
+      const banner = document.getElementById('configBanner');
+      if (state === 'local') banner.classList.remove('hidden');
+      else banner.classList.add('hidden');
+    }
+
+    // ---------- GitHub API ----------
+    function ghHeaders(token, extra = {}) {
+      return {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': 'Bearer ' + token,
+        'X-GitHub-Api-Version': '2022-11-28',
+        ...extra
+      };
+    }
+
+    async function pullFromGitHub() {
+      const cfg = getConfig();
+      if (!cfg || !cfg.token) {
+        // local mode
+        loadLocal();
+        updateSyncUI('local', '本機模式');
+        refresh();
+        return;
+      }
+      updateSyncUI('syncing', '同步中…');
+      try {
+        const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}?ref=${encodeURIComponent(cfg.branch)}`;
+        const res = await fetch(url, { headers: ghHeaders(cfg.token) });
+        if (res.status === 404) {
+          // File does not exist yet — create with current (or empty) data
+          fileSha = null;
+          cases = cases.length ? cases : [];
+          await pushToGitHub('初始化 data.json');
+          syncEnabled = true;
+          updateSyncUI('ok', '已連接 GitHub');
+          refresh();
+          toast('已建立 data.json 並連接');
+          return;
+        }
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || ('HTTP ' + res.status));
+        }
+        const data = await res.json();
+        fileSha = data.sha;
+        const decoded = decodeBase64Utf8(data.content.replace(/\n/g, ''));
+        const parsed = JSON.parse(decoded);
+        cases = Array.isArray(parsed) ? parsed : (parsed.cases || []);
+        // also mirror to local as backup
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(cases));
+        syncEnabled = true;
+        updateSyncUI('ok', '已同步 · ' + new Date().toLocaleTimeString('zh-HK'));
+        refresh();
+        toast('已從 GitHub 載入資料');
+      } catch (e) {
+        console.error(e);
+        updateSyncUI('err', '同步失敗');
+        toast('載入失敗: ' + e.message);
+        // fallback local
+        loadLocal();
+        refresh();
+      }
+    }
+
+    async function pushToGitHub(message) {
+      const cfg = getConfig();
+      if (!cfg || !cfg.token) {
+        // local only
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(cases));
+        return true;
+      }
+      if (saving) return false;
+      saving = true;
+      updateSyncUI('syncing', '儲存中…');
+      try {
+        // Re-fetch SHA to reduce conflict chance
+        const getUrl = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}?ref=${encodeURIComponent(cfg.branch)}`;
+        const getRes = await fetch(getUrl, { headers: ghHeaders(cfg.token) });
+        if (getRes.ok) {
+          const meta = await getRes.json();
+          fileSha = meta.sha;
+        } else if (getRes.status === 404) {
+          fileSha = null;
+        } else {
+          throw new Error('無法取得檔案狀態');
+        }
+
+        const content = encodeBase64Utf8(JSON.stringify(cases, null, 2));
+        const body = {
+          message: message || ('更新個案資料 ' + new Date().toISOString()),
+          content,
+          branch: cfg.branch
+        };
+        if (fileSha) body.sha = fileSha;
+
+        const putUrl = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`;
+        const putRes = await fetch(putUrl, {
+          method: 'PUT',
+          headers: ghHeaders(cfg.token, { 'Content-Type': 'application/json' }),
+          body: JSON.stringify(body)
+        });
+        if (!putRes.ok) {
+          const err = await putRes.json().catch(() => ({}));
+          throw new Error(err.message || ('HTTP ' + putRes.status));
+        }
+        const result = await putRes.json();
+        fileSha = result.content && result.content.sha;
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(cases));
+        syncEnabled = true;
+        updateSyncUI('ok', '已同步 · ' + new Date().toLocaleTimeString('zh-HK'));
+        return true;
+      } catch (e) {
+        console.error(e);
+        updateSyncUI('err', '儲存失敗');
+        toast('儲存到 GitHub 失敗: ' + e.message + '（已暫存本機）');
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(cases));
+        return false;
+      } finally {
+        saving = false;
+      }
+    }
+
+    // UTF-8 safe base64
+    function encodeBase64Utf8(str) {
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+    function decodeBase64Utf8(str) {
+      return decodeURIComponent(escape(atob(str)));
+    }
+
+    async function persist(msg) {
+      await pushToGitHub(msg);
+    }
+
+    function loadLocal() {
+      try {
+        const raw = localStorage.getItem(LOCAL_KEY);
+        cases = raw ? JSON.parse(raw) : [];
+      } catch { cases = []; }
+    }
+
+    // ---------- Helpers ----------
+    function uid() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+    function parseDate(s) {
+      if (!s) return null;
+      const d = new Date(s + 'T00:00:00');
+      return isNaN(d) ? null : d;
+    }
+    function formatDate(s) {
+      if (!s) return '—';
+      const d = parseDate(s);
+      if (!d) return s;
+      return d.toLocaleDateString('zh-HK', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    }
+    function addYears(dateStr, years) {
+      const d = parseDate(dateStr);
+      if (!d) return '';
+      d.setFullYear(d.getFullYear() + years);
+      return d.toISOString().slice(0, 10);
+    }
+    function addMonths(dateStr, months) {
+      const d = parseDate(dateStr);
+      if (!d) return '';
+      d.setMonth(d.getMonth() + months);
+      return d.toISOString().slice(0, 10);
+    }
+    function nextReviewDue(icpDate) {
+      return addYears(icpDate, 1);
+    }
+    function getReviewStatus(c) {
+      if (c.status === 'discharged') return 'discharged';
+      const due = nextReviewDue(c.icpDate);
+      const windowStart = addMonths(due, -1);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dueD = parseDate(due);
+      const winD = parseDate(windowStart);
+      if (!dueD || !winD) return 'ok';
+      if (today > dueD) return 'overdue';
+      if (today >= winD) return 'due';
+      return 'ok';
+    }
+    function statusLabel(s) {
+      if (s === 'overdue') return '<span class="badge badge-overdue">已過期</span>';
+      if (s === 'due') return '<span class="badge badge-due">須覆核</span>';
+      if (s === 'discharged') return '<span class="badge badge-discharged">已離院</span>';
+      return '<span class="badge badge-ok">正常</span>';
+    }
+    function cogBadge(level) {
+      const map = { 'Normal': 'badge-normal', 'MCI': 'badge-mci', 'Major NCD': 'badge-major', 'Dementia': 'badge-dementia' };
+      return `<span class="badge ${map[level] || ''}">${level}</span>`;
+    }
+    function ynBadge(v) {
+      return v === 'Yes' ? '<span class="badge badge-yes">Yes</span>' : '<span class="badge badge-no">No</span>';
+    }
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3200);
+    }
+    function escapeHtml(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // ---------- Form ----------
+    function resetForm() {
+      document.getElementById('caseForm').reset();
+      document.getElementById('editId').value = '';
+      document.getElementById('formTitle').textContent = '新增個案';
+      document.getElementById('btnSubmit').textContent = '儲存個案';
+      document.getElementById('btnCancelEdit').style.display = 'none';
+    }
+    function cancelEdit() { resetForm(); }
+
+    document.getElementById('admissionDate').addEventListener('change', function () {
+      if (!document.getElementById('editId').value) {
+        document.getElementById('icpDate').value = this.value;
+      }
+    });
+
+    document.getElementById('caseForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const editId = document.getElementById('editId').value;
+      const name = document.getElementById('caseName').value.trim();
+      const admissionDate = document.getElementById('admissionDate').value;
+      const icpDate = document.getElementById('icpDate').value;
+      const cognitive = document.getElementById('cognitive').value;
+      const otTraining = document.getElementById('otTraining').value;
+      const gerontech = document.getElementById('gerontech').value;
+      if (!name || !admissionDate || !icpDate) {
+        toast('請填寫所有必填欄位');
+        return;
+      }
+      if (editId) {
+        const idx = cases.findIndex(c => c.id === editId);
+        if (idx === -1) return;
+        cases[idx] = { ...cases[idx], name, admissionDate, icpDate, cognitive, otTraining, gerontech, updatedAt: new Date().toISOString() };
+        await persist('更新個案: ' + name);
+        toast('個案已更新');
+      } else {
+        const activeCount = cases.filter(c => c.status === 'active').length;
+        if (activeCount >= MAX_CASELOAD) {
+          toast('已達最高服務量 70 人，請先離院部分個案');
+          return;
+        }
+        cases.push({
+          id: uid(), name, admissionDate, icpDate, cognitive, otTraining, gerontech,
+          status: 'active', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+        });
+        await persist('新增個案: ' + name);
+        toast('個案已新增');
+      }
+      resetForm();
+      refresh();
+    });
+
+    // ---------- Actions ----------
+    function editCase(id) {
+      const c = cases.find(x => x.id === id);
+      if (!c) return;
+      document.getElementById('editId').value = c.id;
+      document.getElementById('caseName').value = c.name;
+      document.getElementById('admissionDate').value = c.admissionDate;
+      document.getElementById('icpDate').value = c.icpDate;
+      document.getElementById('cognitive').value = c.cognitive;
+      document.getElementById('otTraining').value = c.otTraining;
+      document.getElementById('gerontech').value = c.gerontech;
+      document.getElementById('formTitle').textContent = '編輯個案';
+      document.getElementById('btnSubmit').textContent = '更新個案';
+      document.getElementById('btnCancelEdit').style.display = 'inline-block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function askReview(id) {
+      const c = cases.find(x => x.id === id);
+      if (!c) return;
+      openModal('完成 ICP 覆核', `確定為「${c.name}」完成覆核？ICP Date 將更新為今日，下次覆核期限將自動延後一年。`, async () => {
+        c.icpDate = new Date().toISOString().slice(0, 10);
+        c.updatedAt = new Date().toISOString();
+        await persist('覆核個案: ' + c.name);
+        refresh();
+        toast(`已完成「${c.name}」覆核`);
+      });
+    }
+
+    function askDischarge(id) {
+      const c = cases.find(x => x.id === id);
+      if (!c) return;
+      openModal('確認離院', `確定將「${c.name}」標記為離院？`, async () => {
+        c.status = 'discharged';
+        c.dischargedAt = new Date().toISOString().slice(0, 10);
+        c.updatedAt = new Date().toISOString();
+        await persist('離院: ' + c.name);
+        refresh();
+        toast(`「${c.name}」已離院`);
+      });
+    }
+
+    function askReactivate(id) {
+      const c = cases.find(x => x.id === id);
+      if (!c) return;
+      if (cases.filter(x => x.status === 'active').length >= MAX_CASELOAD) {
+        toast('已達最高服務量 70 人，無法重新入會');
+        return;
+      }
+      openModal('重新入會', `確定將「${c.name}」重新標記為在籍？`, async () => {
+        c.status = 'active';
+        c.dischargedAt = null;
+        c.updatedAt = new Date().toISOString();
+        await persist('重新入會: ' + c.name);
+        refresh();
+        toast(`「${c.name}」已重新入會`);
+      });
+    }
+
+    function askDelete(id) {
+      const c = cases.find(x => x.id === id);
+      if (!c) return;
+      openModal('永久刪除', `確定永久刪除「${c.name}」？此操作無法復原。`, async () => {
+        cases = cases.filter(x => x.id !== id);
+        await persist('刪除個案: ' + c.name);
+        refresh();
+        toast('個案已刪除');
+      }, true);
+    }
+
+    function openModal(title, msg, onConfirm, isDanger = false) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalMsg').textContent = msg;
+      const btn = document.getElementById('modalConfirm');
+      btn.className = isDanger ? 'btn-danger' : 'btn-primary';
+      pendingAction = onConfirm;
+      document.getElementById('modal').classList.add('show');
+    }
+    function closeModal() {
+      document.getElementById('modal').classList.remove('show');
+      pendingAction = null;
+    }
+    document.getElementById('modalConfirm').addEventListener('click', async () => {
+      if (pendingAction) await pendingAction();
+      closeModal();
+    });
+
+    // ---------- Render ----------
+    function refresh() {
+      renderStats();
+      renderAlerts();
+      renderTable();
+      renderCharts();
+    }
+
+    function renderStats() {
+      const active = cases.filter(c => c.status === 'active');
+      const discharged = cases.filter(c => c.status === 'discharged');
+      let ok = 0, due = 0, overdue = 0;
+      active.forEach(c => {
+        const s = getReviewStatus(c);
+        if (s === 'ok') ok++;
+        else if (s === 'due') due++;
+        else if (s === 'overdue') overdue++;
+      });
+      document.getElementById('statActive').textContent = active.length;
+      document.getElementById('statOk').textContent = ok;
+      document.getElementById('statDue').textContent = due;
+      document.getElementById('statOverdue').textContent = overdue;
+      document.getElementById('statDischarged').textContent = discharged.length;
+      const pct = Math.min(100, (active.length / MAX_CASELOAD) * 100);
+      const fill = document.getElementById('caseloadFill');
+      fill.style.width = pct + '%';
+      fill.className = 'caseload-fill' + (pct >= 100 ? ' full' : pct >= 85 ? ' near' : '');
+    }
+
+    function renderAlerts() {
+      const active = cases.filter(c => c.status === 'active');
+      const dueList = [], overdueList = [];
+      active.forEach(c => {
+        const s = getReviewStatus(c);
+        if (s === 'due') dueList.push(c);
+        if (s === 'overdue') overdueList.push(c);
+      });
+      const box = document.getElementById('alertBox');
+      if (!dueList.length && !overdueList.length) { box.style.display = 'none'; return; }
+      let html = '';
+      if (overdueList.length) {
+        html += `<strong>⚠ 已過期未覆核（${overdueList.length}）</strong><ul>`;
+        overdueList.forEach(c => { html += `<li>${escapeHtml(c.name)} — 期限：${formatDate(nextReviewDue(c.icpDate))}</li>`; });
+        html += '</ul>';
+      }
+      if (dueList.length) {
+        html += `<strong style="display:block;margin-top:0.5rem;">📋 一個月內須覆核（${dueList.length}）</strong><ul>`;
+        dueList.forEach(c => { html += `<li>${escapeHtml(c.name)} — 期限：${formatDate(nextReviewDue(c.icpDate))}</li>`; });
+        html += '</ul>';
+      }
+      box.innerHTML = html;
+      box.style.display = 'block';
+    }
+
+    function renderTable() {
+      const statusFilter = document.getElementById('filterStatus').value;
+      const cogFilter = document.getElementById('filterCognitive').value;
+      const search = document.getElementById('searchName').value.trim().toLowerCase();
+      let list = [...cases];
+      if (statusFilter === 'active') list = list.filter(c => c.status === 'active');
+      else if (statusFilter === 'discharged') list = list.filter(c => c.status === 'discharged');
+      else if (statusFilter === 'due') {
+        list = list.filter(c => c.status === 'active' && (getReviewStatus(c) === 'due' || getReviewStatus(c) === 'overdue'));
+      }
+      if (cogFilter) list = list.filter(c => c.cognitive === cogFilter);
+      if (search) list = list.filter(c => c.name.toLowerCase().includes(search));
+      list.sort((a, b) => {
+        const order = { overdue: 0, due: 1, ok: 2, discharged: 3 };
+        const sa = getReviewStatus(a), sb = getReviewStatus(b);
+        if (order[sa] !== order[sb]) return order[sa] - order[sb];
+        return (nextReviewDue(a.icpDate) || '').localeCompare(nextReviewDue(b.icpDate) || '');
+      });
+      const tbody = document.getElementById('caseTableBody');
+      const empty = document.getElementById('emptyMsg');
+      if (!list.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+      empty.style.display = 'none';
+      tbody.innerHTML = list.map(c => {
+        const status = getReviewStatus(c);
+        const due = nextReviewDue(c.icpDate);
+        let actions = '';
+        if (c.status === 'active') {
+          actions = `
+            <button class="btn-success btn-sm" onclick="askReview('${c.id}')">覆核</button>
+            <button class="btn-secondary btn-sm" onclick="editCase('${c.id}')">編輯</button>
+            <button class="btn-warning btn-sm" onclick="askDischarge('${c.id}')">離院</button>
+            <button class="btn-danger btn-sm" onclick="askDelete('${c.id}')">刪除</button>`;
+        } else {
+          actions = `
+            <button class="btn-primary btn-sm" onclick="askReactivate('${c.id}')">重新入會</button>
+            <button class="btn-secondary btn-sm" onclick="editCase('${c.id}')">編輯</button>
+            <button class="btn-danger btn-sm" onclick="askDelete('${c.id}')">刪除</button>`;
+        }
+        return `<tr>
+          <td><strong>${escapeHtml(c.name)}</strong></td>
+          <td>${formatDate(c.admissionDate)}</td>
+          <td>${formatDate(c.icpDate)}</td>
+          <td>${c.status === 'active' ? formatDate(due) : '—'}</td>
+          <td>${statusLabel(status)}</td>
+          <td>${cogBadge(c.cognitive)}</td>
+          <td>${ynBadge(c.otTraining)}</td>
+          <td>${ynBadge(c.gerontech)}</td>
+          <td style="white-space:nowrap;">${actions}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderCharts() {
+      const active = cases.filter(c => c.status === 'active');
+      const cogCounts = { Normal: 0, MCI: 0, 'Major NCD': 0, Dementia: 0 };
+      const otCounts = { Yes: 0, No: 0 };
+      const gerCounts = { Yes: 0, No: 0 };
+      active.forEach(c => {
+        if (cogCounts[c.cognitive] !== undefined) cogCounts[c.cognitive]++;
+        if (otCounts[c.otTraining] !== undefined) otCounts[c.otTraining]++;
+        if (gerCounts[c.gerontech] !== undefined) gerCounts[c.gerontech]++;
+      });
+      const pieOpts = {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: { size: 11 } } } }
+      };
+      if (charts.cognitive) charts.cognitive.destroy();
+      charts.cognitive = new Chart(document.getElementById('chartCognitive'), {
+        type: 'pie',
+        data: { labels: Object.keys(cogCounts), datasets: [{ data: Object.values(cogCounts), backgroundColor: ['#22c55e', '#eab308', '#f97316', '#ef4444'], borderWidth: 2, borderColor: '#fff' }] },
+        options: pieOpts
+      });
+      if (charts.ot) charts.ot.destroy();
+      charts.ot = new Chart(document.getElementById('chartOT'), {
+        type: 'pie',
+        data: { labels: ['Yes', 'No'], datasets: [{ data: [otCounts.Yes, otCounts.No], backgroundColor: ['#3b82f6', '#94a3b8'], borderWidth: 2, borderColor: '#fff' }] },
+        options: pieOpts
+      });
+      if (charts.gerontech) charts.gerontech.destroy();
+      charts.gerontech = new Chart(document.getElementById('chartGerontech'), {
+        type: 'pie',
+        data: { labels: ['Yes', 'No'], datasets: [{ data: [gerCounts.Yes, gerCounts.No], backgroundColor: ['#8b5cf6', '#94a3b8'], borderWidth: 2, borderColor: '#fff' }] },
+        options: pieOpts
+      });
+    }
+
+    // ---------- CSV ----------
+    function exportCSV() {
+      const headers = ['姓名', '入會日期', 'ICP Date', '認知水平', 'OT Training', '使用Gerontech', '狀態', '離院日期'];
+      const rows = cases.map(c => [c.name, c.admissionDate, c.icpDate, c.cognitive, c.otTraining, c.gerontech, c.status === 'active' ? '在籍' : '已離院', c.dischargedAt || '']);
+      const csv = [headers, ...rows].map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `個案資料_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      toast('已匯出 CSV');
+    }
+
+    function importCSV(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async function (ev) {
+        try {
+          const text = ev.target.result.replace(/^\uFEFF/, '');
+          const lines = text.split(/\r?\n/).filter(l => l.trim());
+          if (lines.length < 2) { toast('CSV 內容不足'); return; }
+          function parseLine(line) {
+            const result = []; let cur = '', inQ = false;
+            for (let i = 0; i < line.length; i++) {
+              const ch = line[i];
+              if (ch === '"') { if (inQ && line[i + 1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
+              else if (ch === ',' && !inQ) { result.push(cur); cur = ''; }
+              else cur += ch;
+            }
+            result.push(cur);
+            return result;
+          }
+          let added = 0;
+          for (let i = 1; i < lines.length; i++) {
+            const cols = parseLine(lines[i]);
+            if (cols.length < 6) continue;
+            const name = cols[0].trim();
+            if (!name) continue;
+            const statusStr = (cols[6] || '').trim();
+            const isDischarged = statusStr === '已離院' || statusStr === 'discharged';
+            if (!isDischarged && cases.filter(c => c.status === 'active').length + added >= MAX_CASELOAD) break;
+            cases.push({
+              id: uid(), name,
+              admissionDate: cols[1].trim(),
+              icpDate: cols[2].trim() || cols[1].trim(),
+              cognitive: cols[3].trim() || 'Normal',
+              otTraining: cols[4].trim() === 'Yes' ? 'Yes' : 'No',
+              gerontech: cols[5].trim() === 'Yes' ? 'Yes' : 'No',
+              status: isDischarged ? 'discharged' : 'active',
+              dischargedAt: cols[7] ? cols[7].trim() : null,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            });
+            added++;
+          }
+          await persist('匯入 CSV: ' + added + ' 筆');
+          refresh();
+          toast(`已匯入 ${added} 筆個案`);
+        } catch {
+          toast('匯入失敗，請檢查 CSV 格式');
+        }
+        e.target.value = '';
+      };
+      reader.readAsText(file, 'UTF-8');
+    }
+
+    // ---------- Init ----------
+    (async function init() {
+      const cfg = getConfig();
+      if (cfg && cfg.token) {
+        await pullFromGitHub();
+      } else {
+        loadLocal();
+        updateSyncUI('local', '本機模式');
+        refresh();
+      }
+    })();
+  </script>
+</body>
+</html>
