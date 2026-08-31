@@ -7,16 +7,16 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      --bg: #f0f4f8;
+      --bg: #f1f5f9;
       --card: #ffffff;
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --success: #16a34a;
-      --warning: #d97706;
-      --danger: #dc2626;
+      --primary: #1d4ed8;
+      --primary-dark: #1e3a8a;
+      --success: #047857;
+      --warning: #b45309;
+      --danger: #b91c1c;
       --muted: #64748b;
       --border: #e2e8f0;
-      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+      --shadow: 0 1px 3px rgb(0 0 0 / 0.06), 0 1px 2px rgb(0 0 0 / 0.04);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -27,18 +27,18 @@
       min-height: 100vh;
     }
     header {
-      background: linear-gradient(135deg, #1e40af, #3b82f6);
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
       color: white;
-      padding: 1.25rem 1.5rem;
+      padding: 1rem 1.5rem;
       box-shadow: var(--shadow);
     }
-    header h1 { font-size: 1.5rem; font-weight: 700; }
-    header p { opacity: 0.9; font-size: 0.9rem; margin-top: 0.25rem; }
+    header h1 { font-size: 1.35rem; font-weight: 700; }
+    header p { opacity: 0.9; font-size: 0.85rem; margin-top: 0.15rem; }
     .header-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; }
     .sync-status {
       display: flex; align-items: center; gap: 0.5rem;
-      font-size: 0.85rem; background: rgba(255,255,255,0.15);
-      padding: 0.35rem 0.75rem; border-radius: 999px;
+      font-size: 0.8rem; background: rgba(255,255,255,0.15);
+      padding: 0.3rem 0.7rem; border-radius: 999px;
     }
     .sync-dot {
       width: 8px; height: 8px; border-radius: 50%;
@@ -49,85 +49,133 @@
     .sync-dot.err { background: #f87171; }
     .sync-dot.local { background: #94a3b8; }
     @keyframes pulse { 50% { opacity: 0.4; } }
-    .container { max-width: 1400px; margin: 0 auto; padding: 1.25rem; }
+    .container { max-width: 1480px; margin: 0 auto; padding: 1rem 1.25rem 1.5rem; }
+
     .stats-bar {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1.25rem;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.85rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 700px) {
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
     }
     .stat-card {
       background: var(--card);
-      border-radius: 12px;
-      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
       box-shadow: var(--shadow);
       border: 1px solid var(--border);
       text-align: center;
     }
-    .stat-card .num { font-size: 1.75rem; font-weight: 700; color: var(--primary); }
-    .stat-card .label { font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem; }
+    .stat-card .num { font-size: 1.55rem; font-weight: 700; color: var(--primary); }
+    .stat-card .label { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
     .stat-card.warning .num { color: var(--warning); }
     .stat-card.danger .num { color: var(--danger); }
     .stat-card.success .num { color: var(--success); }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1.4fr;
-      gap: 1.25rem;
-      margin-bottom: 1.25rem;
+    .caseload-bar {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.35rem;
     }
-    @media (max-width: 1024px) {
-      .grid-2 { grid-template-columns: 1fr; }
+    .caseload-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 4px;
+      transition: width 0.3s;
     }
-    .card {
+    .caseload-fill.near { background: var(--warning); }
+    .caseload-fill.full { background: var(--danger); }
+
+    /* Compact form on top, full-width list below */
+    .form-card {
       background: var(--card);
-      border-radius: 12px;
+      border-radius: 10px;
       box-shadow: var(--shadow);
       border: 1px solid var(--border);
+      margin-bottom: 1rem;
       overflow: hidden;
     }
-    .card-header {
-      padding: 0.9rem 1.25rem;
+    .form-card .card-header {
+      padding: 0.55rem 1rem;
       border-bottom: 1px solid var(--border);
       font-weight: 600;
-      font-size: 1rem;
+      font-size: 0.9rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       background: #f8fafc;
     }
-    .card-body { padding: 1.25rem; }
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.9rem;
+    .form-card .card-body { padding: 0.85rem 1rem; }
+    .form-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem 0.85rem;
+      align-items: flex-end;
     }
-    @media (max-width: 600px) {
-      .form-grid { grid-template-columns: 1fr; }
+    .form-inline .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 0;
     }
-    .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
-    .form-group.full { grid-column: 1 / -1; }
-    label { font-size: 0.85rem; font-weight: 500; color: #334155; }
+    .form-inline .form-group.name { flex: 1 1 140px; min-width: 120px; }
+    .form-inline .form-group.date { flex: 0 1 130px; }
+    .form-inline .form-group.select { flex: 0 1 120px; }
+    .form-inline .form-actions {
+      display: flex;
+      gap: 0.45rem;
+      flex: 0 0 auto;
+      padding-bottom: 1px;
+    }
+    label { font-size: 0.75rem; font-weight: 500; color: #475569; }
     input, select {
-      padding: 0.55rem 0.75rem;
+      padding: 0.4rem 0.55rem;
       border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 0.95rem;
+      border-radius: 6px;
+      font-size: 0.88rem;
       transition: border-color 0.15s;
+      width: 100%;
     }
     input:focus, select:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
     }
-    .btn-row { display: flex; gap: 0.6rem; margin-top: 1rem; flex-wrap: wrap; }
+
+    .list-card {
+      background: var(--card);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .list-card .card-header {
+      padding: 0.55rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      background: #f8fafc;
+    }
+    .list-card .card-body { padding: 0.75rem 1rem 1rem; }
+
     button {
       cursor: pointer;
       border: none;
-      border-radius: 8px;
-      padding: 0.55rem 1.1rem;
-      font-size: 0.9rem;
+      border-radius: 6px;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.85rem;
       font-weight: 500;
       transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
     }
     button:active { transform: scale(0.98); }
     button:disabled { opacity: 0.55; cursor: not-allowed; }
@@ -136,44 +184,53 @@
     .btn-secondary { background: #e2e8f0; color: #334155; }
     .btn-secondary:hover:not(:disabled) { background: #cbd5e1; }
     .btn-success { background: var(--success); color: white; }
-    .btn-success:hover:not(:disabled) { background: #15803d; }
+    .btn-success:hover:not(:disabled) { background: #065f46; }
     .btn-danger { background: var(--danger); color: white; }
-    .btn-danger:hover:not(:disabled) { background: #b91c1c; }
-    .btn-warning { background: var(--warning); color: white; }
-    .btn-warning:hover:not(:disabled) { background: #b45309; }
-    .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+    .btn-danger:hover:not(:disabled) { background: #991b1b; }
+    .btn-sm { padding: 0.28rem 0.55rem; font-size: 0.78rem; }
+
     .charts {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 1.25rem;
-      margin-bottom: 1.25rem;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
     }
     @media (max-width: 900px) {
       .charts { grid-template-columns: 1fr; }
     }
     .chart-wrap {
       background: var(--card);
-      border-radius: 12px;
+      border-radius: 10px;
       box-shadow: var(--shadow);
       border: 1px solid var(--border);
-      padding: 1rem;
-      height: 280px;
-      position: relative;
+      padding: 0.85rem 0.75rem 0.5rem;
+      height: 300px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
     .chart-wrap h3 {
-      font-size: 0.95rem;
+      font-size: 0.88rem;
       text-align: center;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.35rem;
       color: #334155;
+      font-weight: 600;
+      flex-shrink: 0;
     }
+    .chart-canvas-box {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+    }
+
     .table-wrap { overflow-x: auto; }
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
     }
     th, td {
-      padding: 0.65rem 0.75rem;
+      padding: 0.55rem 0.65rem;
       text-align: left;
       border-bottom: 1px solid var(--border);
       white-space: nowrap;
@@ -184,52 +241,57 @@
       color: #475569;
       position: sticky;
       top: 0;
+      font-size: 0.8rem;
     }
     tr:hover td { background: #f8fafc; }
     .badge {
       display: inline-block;
-      padding: 0.15rem 0.5rem;
+      padding: 0.12rem 0.45rem;
       border-radius: 999px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 600;
     }
-    .badge-normal { background: #dcfce7; color: #166534; }
-    .badge-mci { background: #fef9c3; color: #854d0e; }
-    .badge-major { background: #ffedd5; color: #9a3412; }
-    .badge-dementia { background: #fee2e2; color: #991b1b; }
-    .badge-yes { background: #dbeafe; color: #1e40af; }
+    .badge-normal { background: #ecfdf5; color: #065f46; }
+    .badge-mci { background: #fffbeb; color: #92400e; }
+    .badge-major { background: #fff7ed; color: #9a3412; }
+    .badge-dementia { background: #fef2f2; color: #991b1b; }
+    .badge-yes { background: #eff6ff; color: #1e40af; }
     .badge-no { background: #f1f5f9; color: #64748b; }
-    .badge-due { background: #fef3c7; color: #92400e; }
-    .badge-overdue { background: #fee2e2; color: #991b1b; }
-    .badge-ok { background: #dcfce7; color: #166534; }
-    .badge-discharged { background: #e2e8f0; color: #475569; }
+    .badge-due { background: #fffbeb; color: #92400e; }
+    .badge-overdue { background: #fef2f2; color: #991b1b; }
+    .badge-ok { background: #ecfdf5; color: #065f46; }
+    .badge-discharged { background: #f1f5f9; color: #475569; }
+
     .filters {
       display: flex;
-      gap: 0.75rem;
+      gap: 0.6rem;
       flex-wrap: wrap;
       align-items: center;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.65rem;
     }
     .filters select, .filters input {
-      padding: 0.4rem 0.6rem;
-      font-size: 0.85rem;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.82rem;
+      width: auto;
     }
     .empty {
       text-align: center;
-      padding: 2rem;
+      padding: 1.75rem;
       color: var(--muted);
+      font-size: 0.9rem;
     }
     .alert-box {
-      background: #fff7ed;
-      border: 1px solid #fed7aa;
-      border-radius: 10px;
-      padding: 0.85rem 1rem;
-      margin-bottom: 1.25rem;
-      font-size: 0.9rem;
-      color: #9a3412;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 8px;
+      padding: 0.7rem 0.9rem;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      color: #92400e;
     }
-    .alert-box strong { color: #c2410c; }
-    .alert-box ul { margin: 0.4rem 0 0 1.2rem; }
+    .alert-box strong { color: #b45309; }
+    .alert-box ul { margin: 0.3rem 0 0 1.1rem; }
+
     .modal-overlay {
       display: none;
       position: fixed;
@@ -246,23 +308,33 @@
       border-radius: 12px;
       max-width: 480px;
       width: 100%;
-      padding: 1.5rem;
+      padding: 1.35rem;
       box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.15);
       max-height: 90vh;
       overflow-y: auto;
     }
-    .modal h3 { margin-bottom: 0.75rem; }
-    .modal p { color: #475569; margin-bottom: 1rem; font-size: 0.95rem; }
-    .modal .btn-row { justify-content: flex-end; }
+    .modal h3 { margin-bottom: 0.65rem; font-size: 1.05rem; }
+    .modal p { color: #475569; margin-bottom: 0.9rem; font-size: 0.9rem; }
+    .modal .btn-row { display: flex; gap: 0.5rem; justify-content: flex-end; flex-wrap: wrap; margin-top: 0.75rem; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .form-grid .form-group { display: flex; flex-direction: column; gap: 0.25rem; }
+    .form-grid .form-group.full { grid-column: 1 / -1; }
+    .hint { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+    .danger-hint { font-size: 0.78rem; color: var(--danger); margin-top: 0.3rem; }
+
     .toast {
       position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
+      bottom: 1.25rem;
+      right: 1.25rem;
       background: #1e293b;
       color: white;
-      padding: 0.75rem 1.25rem;
-      border-radius: 10px;
-      font-size: 0.9rem;
+      padding: 0.65rem 1.1rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
       z-index: 200;
       opacity: 0;
       transform: translateY(12px);
@@ -271,38 +343,22 @@
       max-width: 320px;
     }
     .toast.show { opacity: 1; transform: translateY(0); }
-    .caseload-bar {
-      height: 8px;
-      background: #e2e8f0;
-      border-radius: 4px;
-      overflow: hidden;
-      margin-top: 0.4rem;
-    }
-    .caseload-fill {
-      height: 100%;
-      background: var(--primary);
-      border-radius: 4px;
-      transition: width 0.3s;
-    }
-    .caseload-fill.near { background: var(--warning); }
-    .caseload-fill.full { background: var(--danger); }
+
     .config-banner {
       background: #eff6ff;
       border: 1px solid #bfdbfe;
-      border-radius: 10px;
-      padding: 0.85rem 1rem;
-      margin-bottom: 1.25rem;
-      font-size: 0.9rem;
+      border-radius: 8px;
+      padding: 0.65rem 0.9rem;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
       color: #1e40af;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 1rem;
+      gap: 0.75rem;
       flex-wrap: wrap;
     }
     .config-banner.hidden { display: none; }
-    .hint { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
-    .danger-hint { font-size: 0.8rem; color: var(--danger); margin-top: 0.35rem; }
   </style>
 </head>
 <body>
@@ -325,7 +381,7 @@
       <button type="button" class="btn-primary btn-sm" onclick="openConfig()">設定 GitHub 同步</button>
     </div>
 
-    <!-- Stats -->
+    <!-- Stats (no discharged total) -->
     <div class="stats-bar">
       <div class="stat-card">
         <div class="num" id="statActive">0</div>
@@ -344,131 +400,128 @@
         <div class="num" id="statOverdue">0</div>
         <div class="label">已過期未覆核</div>
       </div>
-      <div class="stat-card">
-        <div class="num" id="statDischarged">0</div>
-        <div class="label">已離院總數</div>
-      </div>
     </div>
 
     <div id="alertBox" class="alert-box" style="display:none;"></div>
 
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-header">
-          <span id="formTitle">新增個案</span>
-          <button type="button" class="btn-secondary btn-sm" id="btnCancelEdit" style="display:none;" onclick="cancelEdit()">取消編輯</button>
-        </div>
-        <div class="card-body">
-          <form id="caseForm">
-            <input type="hidden" id="editId" />
-            <div class="form-grid">
-              <div class="form-group full">
-                <label for="caseName">個案姓名 Case Name *</label>
-                <input type="text" id="caseName" required placeholder="例如：陳大文" />
-              </div>
-              <div class="form-group">
-                <label for="admissionDate">入會月份日期 *</label>
-                <input type="date" id="admissionDate" required />
-              </div>
-              <div class="form-group">
-                <label for="icpDate">ICP Date *</label>
-                <input type="date" id="icpDate" required />
-              </div>
-              <div class="form-group">
-                <label for="cognitive">Cognitive Level *</label>
-                <select id="cognitive" required>
-                  <option value="Normal">Normal</option>
-                  <option value="MCI">MCI</option>
-                  <option value="Major NCD">Major NCD</option>
-                  <option value="Dementia">Dementia</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="otTraining">OT Training *</label>
-                <select id="otTraining" required>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="gerontech">使用 Gerontech *</label>
-                <select id="gerontech" required>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </select>
-              </div>
+    <!-- Compact add/edit form -->
+    <div class="form-card">
+      <div class="card-header">
+        <span id="formTitle">新增個案</span>
+        <button type="button" class="btn-secondary btn-sm" id="btnCancelEdit" style="display:none;" onclick="cancelEdit()">取消編輯</button>
+      </div>
+      <div class="card-body">
+        <form id="caseForm">
+          <input type="hidden" id="editId" />
+          <div class="form-inline">
+            <div class="form-group name">
+              <label for="caseName">個案姓名 *</label>
+              <input type="text" id="caseName" required placeholder="例如：陳大文" />
             </div>
-            <div class="btn-row">
-              <button type="submit" class="btn-primary" id="btnSubmit">儲存個案</button>
+            <div class="form-group date">
+              <label for="admissionDate">入會日期 *</label>
+              <input type="date" id="admissionDate" required />
+            </div>
+            <div class="form-group date">
+              <label for="icpDate">ICP Date *</label>
+              <input type="date" id="icpDate" required />
+            </div>
+            <div class="form-group select">
+              <label for="cognitive">Cognitive Level *</label>
+              <select id="cognitive" required>
+                <option value="Normal">Normal</option>
+                <option value="MCI">MCI</option>
+                <option value="Major NCD">Major NCD</option>
+                <option value="Dementia">Dementia</option>
+              </select>
+            </div>
+            <div class="form-group select">
+              <label for="otTraining">OT Training *</label>
+              <select id="otTraining" required>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div class="form-group select">
+              <label for="gerontech">使用 Gerontech *</label>
+              <select id="gerontech" required>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary" id="btnSubmit">儲存</button>
               <button type="button" class="btn-secondary" onclick="resetForm()">清空</button>
             </div>
-          </form>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Full-width case list -->
+    <div class="list-card">
+      <div class="card-header">
+        <span>個案列表</span>
+        <div style="display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap;">
+          <button type="button" class="btn-secondary btn-sm" onclick="pullFromGitHub()">重新同步</button>
+          <button type="button" class="btn-secondary btn-sm" onclick="openConfig()">GitHub 設定</button>
+          <button type="button" class="btn-secondary btn-sm" onclick="exportCSV()">匯出 CSV</button>
+          <button type="button" class="btn-secondary btn-sm" onclick="document.getElementById('importFile').click()">匯入 CSV</button>
+          <input type="file" id="importFile" accept=".csv" style="display:none;" onchange="importCSV(event)" />
         </div>
       </div>
-
-      <div class="card">
-        <div class="card-header">
-          <span>個案列表</span>
-          <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
-            <button type="button" class="btn-secondary btn-sm" onclick="pullFromGitHub()" title="從 GitHub 重新載入">重新同步</button>
-            <button type="button" class="btn-secondary btn-sm" onclick="openConfig()">GitHub 設定</button>
-            <button type="button" class="btn-secondary btn-sm" onclick="exportCSV()">匯出 CSV</button>
-            <button type="button" class="btn-secondary btn-sm" onclick="document.getElementById('importFile').click()">匯入 CSV</button>
-            <input type="file" id="importFile" accept=".csv" style="display:none;" onchange="importCSV(event)" />
-          </div>
+      <div class="card-body">
+        <div class="filters">
+          <select id="filterStatus" onchange="renderTable()">
+            <option value="active">只顯示在籍</option>
+            <option value="all">全部</option>
+            <option value="discharged">只顯示已離院</option>
+            <option value="due">須覆核 / 已過期</option>
+          </select>
+          <select id="filterCognitive" onchange="renderTable()">
+            <option value="">全部認知水平</option>
+            <option value="Normal">Normal</option>
+            <option value="MCI">MCI</option>
+            <option value="Major NCD">Major NCD</option>
+            <option value="Dementia">Dementia</option>
+          </select>
+          <input type="text" id="searchName" placeholder="搜尋姓名…" oninput="renderTable()" style="min-width:130px;" />
         </div>
-        <div class="card-body">
-          <div class="filters">
-            <select id="filterStatus" onchange="renderTable()">
-              <option value="active">只顯示在籍</option>
-              <option value="all">全部</option>
-              <option value="discharged">只顯示已離院</option>
-              <option value="due">須覆核 / 已過期</option>
-            </select>
-            <select id="filterCognitive" onchange="renderTable()">
-              <option value="">全部認知水平</option>
-              <option value="Normal">Normal</option>
-              <option value="MCI">MCI</option>
-              <option value="Major NCD">Major NCD</option>
-              <option value="Dementia">Dementia</option>
-            </select>
-            <input type="text" id="searchName" placeholder="搜尋姓名…" oninput="renderTable()" style="min-width:140px;" />
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>姓名</th>
-                  <th>入會日期</th>
-                  <th>ICP Date</th>
-                  <th>下次覆核期限</th>
-                  <th>覆核狀態</th>
-                  <th>認知</th>
-                  <th>OT</th>
-                  <th>Gerontech</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody id="caseTableBody"></tbody>
-            </table>
-            <div id="emptyMsg" class="empty" style="display:none;">暫無個案資料</div>
-          </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>入會日期</th>
+                <th>ICP Date</th>
+                <th>下次覆核期限</th>
+                <th>覆核狀態</th>
+                <th>認知</th>
+                <th>OT</th>
+                <th>Gerontech</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="caseTableBody"></tbody>
+          </table>
+          <div id="emptyMsg" class="empty" style="display:none;">暫無個案資料</div>
         </div>
       </div>
     </div>
 
+    <!-- Charts -->
     <div class="charts">
       <div class="chart-wrap">
         <h3>Cognitive Level</h3>
-        <canvas id="chartCognitive"></canvas>
+        <div class="chart-canvas-box"><canvas id="chartCognitive"></canvas></div>
       </div>
       <div class="chart-wrap">
         <h3>OT Training</h3>
-        <canvas id="chartOT"></canvas>
+        <div class="chart-canvas-box"><canvas id="chartOT"></canvas></div>
       </div>
       <div class="chart-wrap">
         <h3>使用 Gerontech</h3>
-        <canvas id="chartGerontech"></canvas>
+        <div class="chart-canvas-box"><canvas id="chartGerontech"></canvas></div>
       </div>
     </div>
   </div>
@@ -510,13 +563,13 @@
         <div class="form-group full">
           <label>Personal Access Token (PAT) *</label>
           <input type="password" id="cfgToken" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off" />
-          <div class="hint">需要 <code>repo</code> 權限（經典 token）或 Contents: Read &amp; Write（fine-grained）。</div>
-          <div class="danger-hint">⚠ Token 有寫入權限，請勿分享此電腦給不可信的人。建議用 fine-grained token 並只授權這一個 repo。</div>
+          <div class="hint">需要 Contents: Read &amp; Write（fine-grained）或 repo（經典 token）。</div>
+          <div class="danger-hint">⚠ Token 有寫入權限，請勿分享此電腦給不可信的人。</div>
         </div>
       </div>
       <div class="btn-row">
         <button type="button" class="btn-secondary" onclick="closeConfig()">取消</button>
-        <button type="button" class="btn-danger btn-sm" onclick="clearConfig()" title="清除本機設定">清除設定</button>
+        <button type="button" class="btn-danger btn-sm" onclick="clearConfig()">清除設定</button>
         <button type="button" class="btn-primary" onclick="saveConfig()">儲存並連接</button>
       </div>
     </div>
@@ -532,22 +585,25 @@
     let cases = [];
     let charts = { cognitive: null, ot: null, gerontech: null };
     let pendingAction = null;
-    let fileSha = null;          // GitHub blob SHA for updates
+    let fileSha = null;
     let syncEnabled = false;
     let saving = false;
 
+    // Professional muted palette
+    const COLORS = {
+      cognitive: ['#2A9D8F', '#E9C46A', '#F4A261', '#E76F51'],
+      binary: ['#3A86FF', '#ADB5BD']
+    };
+
     // ---------- Config ----------
     function getConfig() {
-      try {
-        return JSON.parse(localStorage.getItem(CONFIG_KEY) || 'null');
-      } catch { return null; }
+      try { return JSON.parse(localStorage.getItem(CONFIG_KEY) || 'null'); }
+      catch { return null; }
     }
-
     function setConfig(cfg) {
       if (cfg) localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
       else localStorage.removeItem(CONFIG_KEY);
     }
-
     function openConfig() {
       const cfg = getConfig() || {};
       document.getElementById('cfgOwner').value = cfg.owner || '';
@@ -557,11 +613,9 @@
       document.getElementById('cfgToken').value = cfg.token || '';
       document.getElementById('configModal').classList.add('show');
     }
-
     function closeConfig() {
       document.getElementById('configModal').classList.remove('show');
     }
-
     function clearConfig() {
       setConfig(null);
       syncEnabled = false;
@@ -571,35 +625,27 @@
       closeConfig();
       toast('已清除 GitHub 設定，改回本機儲存');
     }
-
     async function saveConfig() {
       const owner = document.getElementById('cfgOwner').value.trim();
       const repo = document.getElementById('cfgRepo').value.trim();
       const branch = document.getElementById('cfgBranch').value.trim() || 'main';
       const path = document.getElementById('cfgPath').value.trim() || 'data.json';
       const token = document.getElementById('cfgToken').value.trim();
-      if (!owner || !repo || !token) {
-        toast('請填寫用戶名、Repo 與 Token');
-        return;
-      }
+      if (!owner || !repo || !token) { toast('請填寫用戶名、Repo 與 Token'); return; }
       setConfig({ owner, repo, branch, path, token });
       closeConfig();
       toast('設定已儲存，正在連接…');
       await pullFromGitHub();
     }
 
-    // ---------- Sync UI ----------
     function updateSyncUI(state, label) {
-      const dot = document.getElementById('syncDot');
-      const lab = document.getElementById('syncLabel');
-      dot.className = 'sync-dot ' + state;
-      lab.textContent = label;
+      document.getElementById('syncDot').className = 'sync-dot ' + state;
+      document.getElementById('syncLabel').textContent = label;
       const banner = document.getElementById('configBanner');
       if (state === 'local') banner.classList.remove('hidden');
       else banner.classList.add('hidden');
     }
 
-    // ---------- GitHub API ----------
     function ghHeaders(token, extra = {}) {
       return {
         'Accept': 'application/vnd.github+json',
@@ -609,10 +655,12 @@
       };
     }
 
+    function encodeBase64Utf8(str) { return btoa(unescape(encodeURIComponent(str))); }
+    function decodeBase64Utf8(str) { return decodeURIComponent(escape(atob(str))); }
+
     async function pullFromGitHub() {
       const cfg = getConfig();
       if (!cfg || !cfg.token) {
-        // local mode
         loadLocal();
         updateSyncUI('local', '本機模式');
         refresh();
@@ -623,7 +671,6 @@
         const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}?ref=${encodeURIComponent(cfg.branch)}`;
         const res = await fetch(url, { headers: ghHeaders(cfg.token) });
         if (res.status === 404) {
-          // File does not exist yet — create with current (or empty) data
           fileSha = null;
           cases = cases.length ? cases : [];
           await pushToGitHub('初始化 data.json');
@@ -642,7 +689,6 @@
         const decoded = decodeBase64Utf8(data.content.replace(/\n/g, ''));
         const parsed = JSON.parse(decoded);
         cases = Array.isArray(parsed) ? parsed : (parsed.cases || []);
-        // also mirror to local as backup
         localStorage.setItem(LOCAL_KEY, JSON.stringify(cases));
         syncEnabled = true;
         updateSyncUI('ok', '已同步 · ' + new Date().toLocaleTimeString('zh-HK'));
@@ -652,7 +698,6 @@
         console.error(e);
         updateSyncUI('err', '同步失敗');
         toast('載入失敗: ' + e.message);
-        // fallback local
         loadLocal();
         refresh();
       }
@@ -661,7 +706,6 @@
     async function pushToGitHub(message) {
       const cfg = getConfig();
       if (!cfg || !cfg.token) {
-        // local only
         localStorage.setItem(LOCAL_KEY, JSON.stringify(cases));
         return true;
       }
@@ -669,7 +713,6 @@
       saving = true;
       updateSyncUI('syncing', '儲存中…');
       try {
-        // Re-fetch SHA to reduce conflict chance
         const getUrl = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}?ref=${encodeURIComponent(cfg.branch)}`;
         const getRes = await fetch(getUrl, { headers: ghHeaders(cfg.token) });
         if (getRes.ok) {
@@ -680,7 +723,6 @@
         } else {
           throw new Error('無法取得檔案狀態');
         }
-
         const content = encodeBase64Utf8(JSON.stringify(cases, null, 2));
         const body = {
           message: message || ('更新個案資料 ' + new Date().toISOString()),
@@ -688,7 +730,6 @@
           branch: cfg.branch
         };
         if (fileSha) body.sha = fileSha;
-
         const putUrl = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`;
         const putRes = await fetch(putUrl, {
           method: 'PUT',
@@ -716,17 +757,7 @@
       }
     }
 
-    // UTF-8 safe base64
-    function encodeBase64Utf8(str) {
-      return btoa(unescape(encodeURIComponent(str)));
-    }
-    function decodeBase64Utf8(str) {
-      return decodeURIComponent(escape(atob(str)));
-    }
-
-    async function persist(msg) {
-      await pushToGitHub(msg);
-    }
+    async function persist(msg) { await pushToGitHub(msg); }
 
     function loadLocal() {
       try {
@@ -762,9 +793,7 @@
       d.setMonth(d.getMonth() + months);
       return d.toISOString().slice(0, 10);
     }
-    function nextReviewDue(icpDate) {
-      return addYears(icpDate, 1);
-    }
+    function nextReviewDue(icpDate) { return addYears(icpDate, 1); }
     function getReviewStatus(c) {
       if (c.status === 'discharged') return 'discharged';
       const due = nextReviewDue(c.icpDate);
@@ -806,7 +835,7 @@
       document.getElementById('caseForm').reset();
       document.getElementById('editId').value = '';
       document.getElementById('formTitle').textContent = '新增個案';
-      document.getElementById('btnSubmit').textContent = '儲存個案';
+      document.getElementById('btnSubmit').textContent = '儲存';
       document.getElementById('btnCancelEdit').style.display = 'none';
     }
     function cancelEdit() { resetForm(); }
@@ -853,7 +882,6 @@
       refresh();
     });
 
-    // ---------- Actions ----------
     function editCase(id) {
       const c = cases.find(x => x.id === id);
       if (!c) return;
@@ -865,7 +893,7 @@
       document.getElementById('otTraining').value = c.otTraining;
       document.getElementById('gerontech').value = c.gerontech;
       document.getElementById('formTitle').textContent = '編輯個案';
-      document.getElementById('btnSubmit').textContent = '更新個案';
+      document.getElementById('btnSubmit').textContent = '更新';
       document.getElementById('btnCancelEdit').style.display = 'inline-block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -879,36 +907,6 @@
         await persist('覆核個案: ' + c.name);
         refresh();
         toast(`已完成「${c.name}」覆核`);
-      });
-    }
-
-    function askDischarge(id) {
-      const c = cases.find(x => x.id === id);
-      if (!c) return;
-      openModal('確認離院', `確定將「${c.name}」標記為離院？`, async () => {
-        c.status = 'discharged';
-        c.dischargedAt = new Date().toISOString().slice(0, 10);
-        c.updatedAt = new Date().toISOString();
-        await persist('離院: ' + c.name);
-        refresh();
-        toast(`「${c.name}」已離院`);
-      });
-    }
-
-    function askReactivate(id) {
-      const c = cases.find(x => x.id === id);
-      if (!c) return;
-      if (cases.filter(x => x.status === 'active').length >= MAX_CASELOAD) {
-        toast('已達最高服務量 70 人，無法重新入會');
-        return;
-      }
-      openModal('重新入會', `確定將「${c.name}」重新標記為在籍？`, async () => {
-        c.status = 'active';
-        c.dischargedAt = null;
-        c.updatedAt = new Date().toISOString();
-        await persist('重新入會: ' + c.name);
-        refresh();
-        toast(`「${c.name}」已重新入會`);
       });
     }
 
@@ -950,7 +948,6 @@
 
     function renderStats() {
       const active = cases.filter(c => c.status === 'active');
-      const discharged = cases.filter(c => c.status === 'discharged');
       let ok = 0, due = 0, overdue = 0;
       active.forEach(c => {
         const s = getReviewStatus(c);
@@ -962,7 +959,6 @@
       document.getElementById('statOk').textContent = ok;
       document.getElementById('statDue').textContent = due;
       document.getElementById('statOverdue').textContent = overdue;
-      document.getElementById('statDischarged').textContent = discharged.length;
       const pct = Math.min(100, (active.length / MAX_CASELOAD) * 100);
       const fill = document.getElementById('caseloadFill');
       fill.style.width = pct + '%';
@@ -986,7 +982,7 @@
         html += '</ul>';
       }
       if (dueList.length) {
-        html += `<strong style="display:block;margin-top:0.5rem;">📋 一個月內須覆核（${dueList.length}）</strong><ul>`;
+        html += `<strong style="display:block;margin-top:0.4rem;">📋 一個月內須覆核（${dueList.length}）</strong><ul>`;
         dueList.forEach(c => { html += `<li>${escapeHtml(c.name)} — 期限：${formatDate(nextReviewDue(c.icpDate))}</li>`; });
         html += '</ul>';
       }
@@ -1006,12 +1002,15 @@
       }
       if (cogFilter) list = list.filter(c => c.cognitive === cogFilter);
       if (search) list = list.filter(c => c.name.toLowerCase().includes(search));
+
+      // Sort by 入會日期 ascending (earliest first)
       list.sort((a, b) => {
-        const order = { overdue: 0, due: 1, ok: 2, discharged: 3 };
-        const sa = getReviewStatus(a), sb = getReviewStatus(b);
-        if (order[sa] !== order[sb]) return order[sa] - order[sb];
-        return (nextReviewDue(a.icpDate) || '').localeCompare(nextReviewDue(b.icpDate) || '');
+        const da = a.admissionDate || '';
+        const db = b.admissionDate || '';
+        if (da !== db) return da.localeCompare(db);
+        return (a.name || '').localeCompare(b.name || '', 'zh-HK');
       });
+
       const tbody = document.getElementById('caseTableBody');
       const empty = document.getElementById('emptyMsg');
       if (!list.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
@@ -1019,19 +1018,11 @@
       tbody.innerHTML = list.map(c => {
         const status = getReviewStatus(c);
         const due = nextReviewDue(c.icpDate);
-        let actions = '';
-        if (c.status === 'active') {
-          actions = `
-            <button class="btn-success btn-sm" onclick="askReview('${c.id}')">覆核</button>
-            <button class="btn-secondary btn-sm" onclick="editCase('${c.id}')">編輯</button>
-            <button class="btn-warning btn-sm" onclick="askDischarge('${c.id}')">離院</button>
-            <button class="btn-danger btn-sm" onclick="askDelete('${c.id}')">刪除</button>`;
-        } else {
-          actions = `
-            <button class="btn-primary btn-sm" onclick="askReactivate('${c.id}')">重新入會</button>
-            <button class="btn-secondary btn-sm" onclick="editCase('${c.id}')">編輯</button>
-            <button class="btn-danger btn-sm" onclick="askDelete('${c.id}')">刪除</button>`;
-        }
+        // No 離院 button
+        const actions = `
+          <button class="btn-success btn-sm" onclick="askReview('${c.id}')">覆核</button>
+          <button class="btn-secondary btn-sm" onclick="editCase('${c.id}')">編輯</button>
+          <button class="btn-danger btn-sm" onclick="askDelete('${c.id}')">刪除</button>`;
         return `<tr>
           <td><strong>${escapeHtml(c.name)}</strong></td>
           <td>${formatDate(c.admissionDate)}</td>
@@ -1046,8 +1037,54 @@
       }).join('');
     }
 
+    function makePieOptions(total) {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: { top: 4, bottom: 4, left: 4, right: 4 } },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              boxWidth: 10,
+              boxHeight: 10,
+              padding: 8,
+              font: { size: 11 },
+              color: '#475569',
+              generateLabels(chart) {
+                const data = chart.data;
+                if (!data.labels.length) return [];
+                return data.labels.map((label, i) => {
+                  const value = data.datasets[0].data[i] || 0;
+                  const pct = total > 0 ? Math.round((value / total) * 100) : 0;
+                  return {
+                    text: `${label}  ${value} (${pct}%)`,
+                    fillStyle: data.datasets[0].backgroundColor[i],
+                    strokeStyle: '#fff',
+                    lineWidth: 1,
+                    hidden: false,
+                    index: i
+                  };
+                });
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label(ctx) {
+                const value = ctx.raw || 0;
+                const pct = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                return ` ${ctx.label}: ${value} 人 (${pct}%)`;
+              }
+            }
+          }
+        }
+      };
+    }
+
     function renderCharts() {
       const active = cases.filter(c => c.status === 'active');
+      const total = active.length;
       const cogCounts = { Normal: 0, MCI: 0, 'Major NCD': 0, Dementia: 0 };
       const otCounts = { Yes: 0, No: 0 };
       const gerCounts = { Yes: 0, No: 0 };
@@ -1056,34 +1093,65 @@
         if (otCounts[c.otTraining] !== undefined) otCounts[c.otTraining]++;
         if (gerCounts[c.gerontech] !== undefined) gerCounts[c.gerontech]++;
       });
-      const pieOpts = {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: { size: 11 } } } }
-      };
+
+      const opts = makePieOptions(total);
+
       if (charts.cognitive) charts.cognitive.destroy();
       charts.cognitive = new Chart(document.getElementById('chartCognitive'), {
         type: 'pie',
-        data: { labels: Object.keys(cogCounts), datasets: [{ data: Object.values(cogCounts), backgroundColor: ['#22c55e', '#eab308', '#f97316', '#ef4444'], borderWidth: 2, borderColor: '#fff' }] },
-        options: pieOpts
+        data: {
+          labels: Object.keys(cogCounts),
+          datasets: [{
+            data: Object.values(cogCounts),
+            backgroundColor: COLORS.cognitive,
+            borderWidth: 2,
+            borderColor: '#fff',
+            hoverOffset: 4
+          }]
+        },
+        options: opts
       });
+
       if (charts.ot) charts.ot.destroy();
       charts.ot = new Chart(document.getElementById('chartOT'), {
         type: 'pie',
-        data: { labels: ['Yes', 'No'], datasets: [{ data: [otCounts.Yes, otCounts.No], backgroundColor: ['#3b82f6', '#94a3b8'], borderWidth: 2, borderColor: '#fff' }] },
-        options: pieOpts
+        data: {
+          labels: ['Yes', 'No'],
+          datasets: [{
+            data: [otCounts.Yes, otCounts.No],
+            backgroundColor: COLORS.binary,
+            borderWidth: 2,
+            borderColor: '#fff',
+            hoverOffset: 4
+          }]
+        },
+        options: opts
       });
+
       if (charts.gerontech) charts.gerontech.destroy();
       charts.gerontech = new Chart(document.getElementById('chartGerontech'), {
         type: 'pie',
-        data: { labels: ['Yes', 'No'], datasets: [{ data: [gerCounts.Yes, gerCounts.No], backgroundColor: ['#8b5cf6', '#94a3b8'], borderWidth: 2, borderColor: '#fff' }] },
-        options: pieOpts
+        data: {
+          labels: ['Yes', 'No'],
+          datasets: [{
+            data: [gerCounts.Yes, gerCounts.No],
+            backgroundColor: ['#5E60CE', '#ADB5BD'],
+            borderWidth: 2,
+            borderColor: '#fff',
+            hoverOffset: 4
+          }]
+        },
+        options: opts
       });
     }
 
     // ---------- CSV ----------
     function exportCSV() {
       const headers = ['姓名', '入會日期', 'ICP Date', '認知水平', 'OT Training', '使用Gerontech', '狀態', '離院日期'];
-      const rows = cases.map(c => [c.name, c.admissionDate, c.icpDate, c.cognitive, c.otTraining, c.gerontech, c.status === 'active' ? '在籍' : '已離院', c.dischargedAt || '']);
+      const rows = cases.map(c => [
+        c.name, c.admissionDate, c.icpDate, c.cognitive, c.otTraining, c.gerontech,
+        c.status === 'active' ? '在籍' : '已離院', c.dischargedAt || ''
+      ]);
       const csv = [headers, ...rows].map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
       const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
       const a = document.createElement('a');
