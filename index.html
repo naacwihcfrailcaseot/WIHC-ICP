@@ -573,20 +573,20 @@
       </div>
       <div class="card-body">
         <div class="filters">
-          <select id="filterStatus" onchange="renderTable()">
-            <option value="active">只顯示在籍</option>
+          <select id="filterStatus" onchange="renderTable()" autocomplete="off">
+            <option value="active" selected>只顯示在籍</option>
             <option value="all">全部</option>
             <option value="discharged">只顯示已離院</option>
             <option value="due">須覆核 / 已過期</option>
           </select>
-          <select id="filterCognitive" onchange="renderTable()">
-            <option value="">全部認知水平</option>
+          <select id="filterCognitive" onchange="renderTable()" autocomplete="off">
+            <option value="" selected>全部認知水平</option>
             <option value="Normal">Normal</option>
             <option value="MCI">MCI</option>
             <option value="Major NCD">Major NCD</option>
             <option value="Dementia">Dementia</option>
           </select>
-          <input type="text" id="searchName" placeholder="搜尋姓名…" oninput="renderTable()" style="min-width:130px;" />
+          <input type="text" id="searchName" placeholder="搜尋姓名…" oninput="renderTable()" style="min-width:130px;" autocomplete="off" />
         </div>
         <div class="table-wrap">
           <table>
@@ -789,7 +789,8 @@
         const res = await fetch(url, { headers: ghHeaders(cfg.token) });
         if (res.status === 404) {
           fileSha = null;
-          cases = cases.length ? cases : [];
+          // Keep whatever is already in memory (local), push as initial file
+          if (!cases.length) loadLocal();
           await pushToGitHub('初始化 data.json');
           syncEnabled = true;
           updateSyncUI('ok', '已連接 GitHub');
@@ -805,7 +806,20 @@
         fileSha = data.sha;
         const decoded = decodeBase64Utf8(data.content.replace(/\n/g, ''));
         const parsed = JSON.parse(decoded);
-        cases = Array.isArray(parsed) ? parsed : (parsed.cases || []);
+        let remote = normalizeCases(Array.isArray(parsed) ? parsed : (parsed.cases || []));
+
+        // Avoid wiping local data if remote is empty but local has cases
+        if (remote.length === 0 && cases.length > 0) {
+          syncEnabled = true;
+          updateSyncUI('ok', '已連接（保留本機資料）');
+          refresh();
+          toast('GitHub 檔案為空，已保留本機個案');
+          // Push local up so remote is no longer empty
+          await pushToGitHub('同步本機資料到 GitHub');
+          return;
+        }
+
+        cases = remote;
         localStorage.setItem(LOCAL_KEY, JSON.stringify(cases));
         syncEnabled = true;
         updateSyncUI('ok', '已同步 · ' + new Date().toLocaleTimeString('zh-HK'));
@@ -876,11 +890,35 @@
 
     async function persist(msg) { await pushToGitHub(msg); }
 
+    function normalizeCases(arr) {
+      if (!Array.isArray(arr)) return [];
+      return arr.map(c => {
+        if (!c || typeof c !== 'object') return null;
+        // Missing status → treat as active (fixes rows vanishing from default filter)
+        const status = c.status === 'discharged' ? 'discharged' : 'active';
+        return { ...c, status };
+      }).filter(Boolean);
+    }
+
     function loadLocal() {
       try {
         const raw = localStorage.getItem(LOCAL_KEY);
-        cases = raw ? JSON.parse(raw) : [];
+        cases = normalizeCases(raw ? JSON.parse(raw) : []);
       } catch { cases = []; }
+    }
+
+    /** Active = not discharged (missing status counts as active) */
+    function isActive(c) {
+      return c && c.status !== 'discharged';
+    }
+
+    function resetFilters() {
+      const fs = document.getElementById('filterStatus');
+      const fc = document.getElementById('filterCognitive');
+      const sn = document.getElementById('searchName');
+      if (fs) fs.value = 'active';
+      if (fc) fc.value = '';
+      if (sn) sn.value = '';
     }
 
     // ---------- Helpers ----------
@@ -983,7 +1021,7 @@
         await persist('更新個案: ' + name);
         toast('個案已更新');
       } else {
-        const activeCount = cases.filter(c => c.status === 'active').length;
+        const activeCount = cases.filter(isActive).length;
         if (activeCount >= MAX_CASELOAD) {
           toast('已達最高服務量 70 人，請先離院部分個案');
           return;
@@ -1076,7 +1114,7 @@
     }
 
     function renderReviewByMonth() {
-      const active = cases.filter(c => c.status === 'active' && c.icpDate);
+      const active = cases.filter(c => isActive(c) && c.icpDate);
       const groups = {}; // key YYYY-MM -> { cases: [], hasOverdue, hasDue }
 
       const today = new Date();
@@ -1143,7 +1181,7 @@
     }
 
     function renderStats() {
-      const active = cases.filter(c => c.status === 'active');
+      const active = cases.filter(isActive);
       let ok = 0, due = 0, overdue = 0;
       active.forEach(c => {
         const s = getReviewStatus(c);
@@ -1162,7 +1200,7 @@
     }
 
     function renderAlerts() {
-      const active = cases.filter(c => c.status === 'active');
+      const active = cases.filter(isActive);
       const dueList = [], overdueList = [];
       active.forEach(c => {
         const s = getReviewStatus(c);
@@ -1191,13 +1229,13 @@
       const cogFilter = document.getElementById('filterCognitive').value;
       const search = document.getElementById('searchName').value.trim().toLowerCase();
       let list = [...cases];
-      if (statusFilter === 'active') list = list.filter(c => c.status === 'active');
+      if (statusFilter === 'active') list = list.filter(isActive);
       else if (statusFilter === 'discharged') list = list.filter(c => c.status === 'discharged');
       else if (statusFilter === 'due') {
-        list = list.filter(c => c.status === 'active' && (getReviewStatus(c) === 'due' || getReviewStatus(c) === 'overdue'));
+        list = list.filter(c => isActive(c) && (getReviewStatus(c) === 'due' || getReviewStatus(c) === 'overdue'));
       }
       if (cogFilter) list = list.filter(c => c.cognitive === cogFilter);
-      if (search) list = list.filter(c => c.name.toLowerCase().includes(search));
+      if (search) list = list.filter(c => (c.name || '').toLowerCase().includes(search));
 
       // Sort by 入會日期 ascending (earliest first)
       list.sort((a, b) => {
@@ -1214,7 +1252,6 @@
       tbody.innerHTML = list.map(c => {
         const status = getReviewStatus(c);
         const due = nextReviewDue(c.icpDate);
-        // No 離院 button
         const actions = `
           <button class="btn-success btn-sm" onclick="askReview('${c.id}')">覆核</button>
           <button class="btn-secondary btn-sm" onclick="editCase('${c.id}')">編輯</button>
@@ -1223,7 +1260,7 @@
           <td><strong>${escapeHtml(c.name)}</strong></td>
           <td>${formatDate(c.admissionDate)}</td>
           <td>${formatDate(c.icpDate)}</td>
-          <td>${c.status === 'active' ? formatDate(due) : '—'}</td>
+          <td>${isActive(c) ? formatDate(due) : '—'}</td>
           <td>${statusLabel(status)}</td>
           <td>${cogBadge(c.cognitive)}</td>
           <td>${ynBadge(c.otTraining)}</td>
@@ -1279,7 +1316,7 @@
     }
 
     function renderCharts() {
-      const active = cases.filter(c => c.status === 'active');
+      const active = cases.filter(isActive);
       const total = active.length;
       const cogCounts = { Normal: 0, MCI: 0, 'Major NCD': 0, Dementia: 0 };
       const otCounts = { Yes: 0, No: 0 };
@@ -1346,7 +1383,7 @@
       const headers = ['姓名', '入會日期', 'ICP Date', '認知水平', 'OT Training', '使用Gerontech', '狀態', '離院日期'];
       const rows = cases.map(c => [
         c.name, c.admissionDate, c.icpDate, c.cognitive, c.otTraining, c.gerontech,
-        c.status === 'active' ? '在籍' : '已離院', c.dischargedAt || ''
+        isActive(c) ? '在籍' : '已離院', c.dischargedAt || ''
       ]);
       const csv = [headers, ...rows].map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
       const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -1386,7 +1423,7 @@
             if (!name) continue;
             const statusStr = (cols[6] || '').trim();
             const isDischarged = statusStr === '已離院' || statusStr === 'discharged';
-            if (!isDischarged && cases.filter(c => c.status === 'active').length + added >= MAX_CASELOAD) break;
+            if (!isDischarged && cases.filter(isActive).length + added >= MAX_CASELOAD) break;
             cases.push({
               id: uid(), name,
               admissionDate: cols[1].trim(),
@@ -1414,14 +1451,30 @@
 
     // ---------- Init ----------
     (async function init() {
+      // Always show local data first so the list never flashes empty
+      loadLocal();
+      resetFilters();
+      refresh();
+
       const cfg = getConfig();
       if (cfg && cfg.token) {
         await pullFromGitHub();
-      } else {
-        loadLocal();
-        updateSyncUI('local', '本機模式');
+        // Re-assert default filters after async load (browser may restore form state)
+        resetFilters();
         refresh();
+      } else {
+        updateSyncUI('local', '本機模式');
       }
+
+      // Guard against delayed browser form restoration clearing the list
+      setTimeout(() => {
+        resetFilters();
+        renderTable();
+      }, 500);
+      setTimeout(() => {
+        resetFilters();
+        renderTable();
+      }, 1500);
     })();
   </script>
 </body>
