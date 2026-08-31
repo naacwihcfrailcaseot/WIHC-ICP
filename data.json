@@ -274,5 +274,29 @@
     "status": "active",
     "createdAt": "2026-08-31T08:31:51.536Z",
     "updatedAt": "2026-08-31T08:31:51.536Z"
+  },
+  {
+    "id": "mtgzd2rn7nu2s2",
+    "name": "L利冠",
+    "admissionDate": "2023-03-01",
+    "icpDate": "2026-03-11",
+    "cognitive": "Major NCD",
+    "otTraining": "Yes",
+    "gerontech": "No",
+    "status": "active",
+    "createdAt": "2026-08-31T08:32:33.347Z",
+    "updatedAt": "2026-08-31T08:32:33.347Z"
+  },
+  {
+    "id": "mtgzeqc8inx3kh",
+    "name": "L華新",
+    "admissionDate": "2023-03-03",
+    "icpDate": "2026-03-12",
+    "cognitive": "Normal",
+    "otTraining": "Yes",
+    "gerontech": "No",
+    "status": "active",
+    "createdAt": "2026-08-31T08:33:50.552Z",
+    "updatedAt": "2026-08-31T08:33:50.552Z"
   }
 ]
