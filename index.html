@@ -223,6 +223,107 @@
       position: relative;
     }
 
+    /* Review schedule by month */
+    .review-schedule {
+      background: var(--card);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+    .review-schedule .card-header {
+      padding: 0.55rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 0.9rem;
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .review-schedule .card-body { padding: 0.85rem 1rem 1rem; }
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 0.75rem;
+    }
+    .month-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fafbfc;
+    }
+    .month-card.overdue-month { border-color: #fecaca; background: #fef2f2; }
+    .month-card.due-month { border-color: #fde68a; background: #fffbeb; }
+    .month-card.current-month { border-color: #bfdbfe; background: #eff6ff; }
+    .month-title {
+      padding: 0.45rem 0.7rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #334155;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255,255,255,0.6);
+    }
+    .month-title .count {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #64748b;
+      background: #e2e8f0;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+    }
+    .month-card.overdue-month .month-title .count { background: #fecaca; color: #991b1b; }
+    .month-card.due-month .month-title .count { background: #fde68a; color: #92400e; }
+    .month-card.current-month .month-title .count { background: #bfdbfe; color: #1e40af; }
+    .month-cases {
+      list-style: none;
+      padding: 0.4rem 0.55rem 0.5rem;
+      margin: 0;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+    .month-cases li {
+      font-size: 0.8rem;
+      padding: 0.28rem 0.35rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.4rem;
+      border-radius: 4px;
+    }
+    .month-cases li:hover { background: rgba(0,0,0,0.03); }
+    .month-cases .case-name {
+      font-weight: 500; color: #1e293b; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .month-cases .case-due { font-size: 0.72rem; color: #64748b; white-space: nowrap; }
+    .month-cases .case-due.overdue { color: #b91c1c; font-weight: 600; }
+    .month-cases .case-due.due-soon { color: #b45309; font-weight: 600; }
+    .schedule-empty {
+      text-align: center;
+      padding: 1.25rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+    .schedule-legend {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+    .schedule-legend span { display: flex; align-items: center; gap: 0.3rem; }
+    .legend-dot {
+      width: 8px; height: 8px; border-radius: 2px; display: inline-block;
+    }
+
     .table-wrap { overflow-x: auto; }
     table {
       width: 100%;
@@ -522,6 +623,22 @@
       <div class="chart-wrap">
         <h3>使用 Gerontech</h3>
         <div class="chart-canvas-box"><canvas id="chartGerontech"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Review schedule grouped by month -->
+    <div class="review-schedule">
+      <div class="card-header">
+        <span>覆核時間表（按下次覆核期限月份分組）</span>
+        <div class="schedule-legend">
+          <span><i class="legend-dot" style="background:#fecaca;"></i> 已過期</span>
+          <span><i class="legend-dot" style="background:#fde68a;"></i> 一個月內須覆核</span>
+          <span><i class="legend-dot" style="background:#bfdbfe;"></i> 本月期限</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="reviewByMonth" class="month-grid"></div>
+        <div id="reviewByMonthEmpty" class="schedule-empty" style="display:none;">暫無在籍個案的覆核安排</div>
       </div>
     </div>
   </div>
@@ -944,6 +1061,85 @@
       renderAlerts();
       renderTable();
       renderCharts();
+      renderReviewByMonth();
+    }
+
+    function monthKey(dateStr) {
+      if (!dateStr || dateStr.length < 7) return null;
+      return dateStr.slice(0, 7); // YYYY-MM
+    }
+
+    function formatMonthLabel(ym) {
+      if (!ym) return '—';
+      const [y, m] = ym.split('-');
+      return `${y}年${parseInt(m, 10)}月`;
+    }
+
+    function renderReviewByMonth() {
+      const active = cases.filter(c => c.status === 'active' && c.icpDate);
+      const groups = {}; // key YYYY-MM -> { cases: [], hasOverdue, hasDue }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const currentYM = today.toISOString().slice(0, 7);
+
+      active.forEach(c => {
+        const due = nextReviewDue(c.icpDate);
+        const key = monthKey(due);
+        if (!key) return;
+        if (!groups[key]) groups[key] = { cases: [], hasOverdue: false, hasDue: false };
+        const status = getReviewStatus(c);
+        groups[key].cases.push({ case: c, due, status });
+        if (status === 'overdue') groups[key].hasOverdue = true;
+        if (status === 'due') groups[key].hasDue = true;
+      });
+
+      // Sort cases within each month by due date then name
+      Object.keys(groups).forEach(k => {
+        groups[k].cases.sort((a, b) => {
+          if (a.due !== b.due) return a.due.localeCompare(b.due);
+          return (a.case.name || '').localeCompare(b.case.name || '', 'zh-HK');
+        });
+      });
+
+      // Sort months ascending
+      const keys = Object.keys(groups).sort();
+
+      const container = document.getElementById('reviewByMonth');
+      const empty = document.getElementById('reviewByMonthEmpty');
+
+      if (!keys.length) {
+        container.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      container.innerHTML = keys.map(ym => {
+        const g = groups[ym];
+        let cardClass = 'month-card';
+        if (g.hasOverdue) cardClass += ' overdue-month';
+        else if (g.hasDue) cardClass += ' due-month';
+        else if (ym === currentYM) cardClass += ' current-month';
+
+        const items = g.cases.map(({ case: c, due, status }) => {
+          let dueClass = 'case-due';
+          if (status === 'overdue') dueClass += ' overdue';
+          else if (status === 'due') dueClass += ' due-soon';
+          return `<li>
+            <span class="case-name" title="${escapeHtml(c.name)}">${escapeHtml(c.name)}</span>
+            <span class="${dueClass}">${formatDate(due)}</span>
+          </li>`;
+        }).join('');
+
+        return `<div class="${cardClass}">
+          <div class="month-title">
+            <span>${formatMonthLabel(ym)}</span>
+            <span class="count">${g.cases.length} 人</span>
+          </div>
+          <ul class="month-cases">${items}</ul>
+        </div>`;
+      }).join('');
     }
 
     function renderStats() {
