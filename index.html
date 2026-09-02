@@ -267,6 +267,15 @@
     .filters select, .filters input {
       padding: 0.32rem 0.45rem; font-size: 0.8rem; width: auto;
     }
+    .filter-btns { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+    .filter-btn {
+      background: #edf2f7; color: #2d3748; border: 1px solid #cbd5e0;
+      padding: 0.28rem 0.55rem; font-size: 0.75rem; border-radius: 999px;
+    }
+    .filter-btn:hover { background: #e2e8f0; }
+    .filter-btn.active {
+      background: #2c5282; color: #fff; border-color: #2c5282;
+    }
 
     .alert-box {
       background: #fffaf0; border: 1px solid #fbd38d; border-radius: 6px;
@@ -472,20 +481,21 @@
       </div>
       <div class="card-body">
         <div class="filters no-print">
-          <select id="filterStatus" onchange="renderTable()">
-            <option value="active" selected>只顯示在籍</option>
-            <option value="all">全部</option>
-            <option value="discharged">只顯示已離院</option>
-            <option value="due">須覆核 / 已過期</option>
-          </select>
-          <select id="filterCognitive" onchange="renderTable()">
+          <div class="filter-btns" id="filterStatusBtns">
+            <button type="button" class="filter-btn active" data-filter="active">在籍</button>
+            <button type="button" class="filter-btn" data-filter="all">全部</button>
+            <button type="button" class="filter-btn" data-filter="due">須覆核/過期</button>
+            <button type="button" class="filter-btn" data-filter="discharged">已離院</button>
+          </div>
+          <select id="filterCognitive">
             <option value="" selected>全部認知水平</option>
             <option value="Normal">Normal</option>
             <option value="MCI">MCI</option>
             <option value="Major NCD">Major NCD</option>
             <option value="Dementia">Dementia</option>
           </select>
-          <input type="text" id="searchName" placeholder="搜尋姓名…" oninput="renderTable()" style="min-width:120px;" autocomplete="off" />
+          <input type="text" id="searchName" placeholder="搜尋姓名…" style="min-width:120px;" autocomplete="off" />
+          <span id="tableDebug" style="font-size:0.72rem;color:#5a6a7a;margin-left:0.25rem;"></span>
         </div>
         <div class="table-wrap">
           <table>
@@ -1053,20 +1063,36 @@
       box.style.display = 'block';
     }
 
+    // Filter state (not stored in <select>, so browser cannot restore wrong value)
+    var currentStatusFilter = 'active';
+
+    function setStatusFilter(f) {
+      currentStatusFilter = f || 'active';
+      var btns = document.querySelectorAll('#filterStatusBtns .filter-btn');
+      for (var i = 0; i < btns.length; i++) {
+        if (btns[i].getAttribute('data-filter') === currentStatusFilter) {
+          btns[i].classList.add('active');
+        } else {
+          btns[i].classList.remove('active');
+        }
+      }
+      renderTable();
+    }
+
     function renderTable() {
-      var statusFilter = 'active';
       var cogFilter = '';
       var search = '';
       try {
-        var fs = document.getElementById('filterStatus');
         var fc = document.getElementById('filterCognitive');
         var sn = document.getElementById('searchName');
-        if (fs && fs.value) statusFilter = fs.value;
         if (fc && fc.value) cogFilter = fc.value;
         if (sn && sn.value) search = sn.value.trim().toLowerCase();
       } catch (e) {}
 
+      var statusFilter = currentStatusFilter || 'active';
       var list = Array.isArray(cases) ? cases.slice() : [];
+      var totalAll = list.length;
+      var totalActive = list.filter(isActive).length;
 
       if (statusFilter === 'active') list = list.filter(isActive);
       else if (statusFilter === 'discharged') list = list.filter(function (c) { return c.status === 'discharged'; });
@@ -1078,6 +1104,18 @@
       if (cogFilter) list = list.filter(function (c) { return c.cognitive === cogFilter; });
       if (search) list = list.filter(function (c) { return (c.name || '').toLowerCase().indexOf(search) !== -1; });
 
+      // Safety net: if filters hid everything but we still have active cases,
+      // fall back to showing all active (prevents "sudden empty list")
+      if (!list.length && totalActive > 0 && (statusFilter !== 'discharged') && !cogFilter && !search) {
+        if (statusFilter === 'due') {
+          // genuine empty due-list — ok
+        } else {
+          list = cases.filter(isActive);
+          statusFilter = 'active';
+          currentStatusFilter = 'active';
+        }
+      }
+
       list.sort(function (a, b) {
         var da = a.admissionDate || '';
         var db = b.admissionDate || '';
@@ -1088,7 +1126,9 @@
       var tbody = document.getElementById('caseTableBody');
       var empty = document.getElementById('emptyMsg');
       var countEl = document.getElementById('listCount');
+      var dbg = document.getElementById('tableDebug');
       if (countEl) countEl.textContent = list.length ? '（' + list.length + '）' : '';
+      if (dbg) dbg.textContent = '資料庫: ' + totalAll + ' · 在籍: ' + totalActive + ' · 顯示: ' + list.length;
       if (!tbody) return;
 
       if (!list.length) {
@@ -1124,7 +1164,7 @@
       tbody.innerHTML = rows.join('');
     }
 
-    document.getElementById('caseTableBody').addEventListener('click', function (e) {
+        document.getElementById('caseTableBody').addEventListener('click', function (e) {
       var btn = e.target.closest('button[data-act]');
       if (!btn) return;
       var id = btn.getAttribute('data-id');
@@ -1359,16 +1399,46 @@
       reader.readAsText(file, 'UTF-8');
     }
 
+    // Filter controls
+    document.getElementById('filterStatusBtns').addEventListener('click', function (e) {
+      var btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      setStatusFilter(btn.getAttribute('data-filter'));
+    });
+    document.getElementById('filterCognitive').addEventListener('change', function () { renderTable(); });
+    document.getElementById('searchName').addEventListener('input', function () { renderTable(); });
+
+    // Re-render if browser restores page from cache with empty table
+    window.addEventListener('pageshow', function () {
+      currentStatusFilter = 'active';
+      setStatusFilter('active');
+      if (cases.length) refreshAll();
+    });
+
+    // Watchdog: if we have cases but table body is empty, force re-render
+    setInterval(function () {
+      try {
+        var tbody = document.getElementById('caseTableBody');
+        var activeCount = cases.filter(isActive).length;
+        if (activeCount > 0 && tbody && tbody.children.length === 0 && currentStatusFilter === 'active') {
+          var sn = document.getElementById('searchName');
+          var fc = document.getElementById('filterCognitive');
+          if (sn) sn.value = '';
+          if (fc) fc.value = '';
+          renderTable();
+        }
+      } catch (e) {}
+    }, 2000);
+
     (async function init() {
+      currentStatusFilter = 'active';
       loadLocal();
       refreshAll();
       if (getToken()) {
-        if (GH_OWNER === 'YOUR_GITHUB_USERNAME') {
-          updateSyncUI('err', '請設定 GH_OWNER');
-          toast('請在 HTML 中設定 GH_OWNER 為你的 GitHub 用戶名');
-        } else {
-          await pullFromGitHub();
-        }
+        await pullFromGitHub();
+        // After sync, force active filter again
+        currentStatusFilter = 'active';
+        setStatusFilter('active');
       } else {
         updateSyncUI('local', '本機模式');
       }
