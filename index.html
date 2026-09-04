@@ -234,6 +234,61 @@
     .schedule-legend span { display: flex; align-items: center; gap: 0.25rem; }
     .legend-dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
 
+    .gt-section { margin-bottom: 0.9rem; }
+    .gt-section .card-body { padding: 0.75rem 0.95rem 0.95rem; }
+    .gt-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 0.85rem;
+    }
+    @media (max-width: 900px) { .gt-grid { grid-template-columns: 1fr; } }
+    .gt-panel {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #f7fafc;
+      overflow: hidden;
+    }
+    .gt-panel-title {
+      padding: 0.4rem 0.65rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--primary);
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.7);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .gt-panel-body { padding: 0.55rem 0.65rem 0.65rem; }
+    .gt-form-row {
+      display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: flex-end; margin-bottom: 0.55rem;
+    }
+    .gt-form-row .form-group { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+    .gt-form-row .fg-name { flex: 1 1 120px; }
+    .gt-form-row .fg-note { flex: 1 1 100px; }
+    .gt-form-row .fg-date { flex: 0 1 130px; }
+    .gt-form-row .fg-time { flex: 0 1 100px; }
+    .gt-form-row .fg-select { flex: 1 1 130px; min-width: 110px; }
+    .gt-list { list-style: none; margin: 0; padding: 0; max-height: 260px; overflow-y: auto; }
+    .gt-list li {
+      display: flex; justify-content: space-between; align-items: center; gap: 0.4rem;
+      padding: 0.4rem 0.35rem; border-bottom: 1px solid #e2e8f0; font-size: 0.8rem;
+    }
+    .gt-list li:last-child { border-bottom: none; }
+    .gt-list li:hover { background: rgba(0,0,0,0.03); }
+    .gt-list .gt-main { min-width: 0; flex: 1; }
+    .gt-list .gt-name { font-weight: 600; color: var(--text); }
+    .gt-list .gt-meta { font-size: 0.72rem; color: var(--muted); margin-top: 0.1rem; }
+    .gt-list .gt-actions { display: flex; gap: 0.25rem; flex-shrink: 0; }
+    .gt-conflict {
+      background: #fff5f5; border: 1px solid #feb2b2; color: #9b2c2c;
+      border-radius: 5px; padding: 0.4rem 0.55rem; font-size: 0.78rem; margin-bottom: 0.5rem;
+      display: none;
+    }
+    .gt-conflict.show { display: block; }
+    .badge-device { background: #e9d8fd; color: #553c9a; }
+
+
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
     th, td {
@@ -273,9 +328,23 @@
       padding: 0.28rem 0.55rem; font-size: 0.75rem; border-radius: 999px;
     }
     .filter-btn:hover { background: #e2e8f0; }
-    .filter-btn.active {
+    .filter-btn.is-on {
       background: #2c5282; color: #fff; border-color: #2c5282;
     }
+    .case-combo { position: relative; flex: 1 1 160px; min-width: 140px; }
+    .case-combo input { width: 100%; }
+    .case-combo-list {
+      display: none; position: absolute; left: 0; right: 0; top: 100%; z-index: 50;
+      max-height: 180px; overflow-y: auto; background: #fff;
+      border: 1px solid var(--border); border-radius: 5px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12); margin-top: 2px;
+    }
+    .case-combo-list.show { display: block; }
+    .case-combo-list div {
+      padding: 0.4rem 0.55rem; font-size: 0.8rem; cursor: pointer;
+    }
+    .case-combo-list div:hover, .case-combo-list div.hl { background: #ebf2f9; }
+
 
     .alert-box {
       background: #fffaf0; border: 1px solid #fbd38d; border-radius: 6px;
@@ -482,8 +551,7 @@
       <div class="card-body">
         <div class="filters no-print">
           <div class="filter-btns" id="filterStatusBtns">
-            <button type="button" class="filter-btn active" data-filter="active">在籍</button>
-            <button type="button" class="filter-btn" data-filter="all">全部</button>
+            <button type="button" class="filter-btn is-on" data-filter="all">全部</button>
             <button type="button" class="filter-btn" data-filter="due">須覆核/過期</button>
             <button type="button" class="filter-btn" data-filter="discharged">已離院</button>
           </div>
@@ -531,6 +599,119 @@
       <div class="chart-wrap">
         <h3>使用 Gerontech</h3>
         <div class="chart-canvas-box"><canvas id="chartGerontech"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Gerontech devices & bookings -->
+    <div class="list-card gt-section">
+      <div class="card-header">
+        <span>Gerontech 器材預約（每件僅一套 · 不可重疊）</span>
+      </div>
+      <div class="card-body">
+        <div class="gt-grid">
+          <!-- Device inventory -->
+          <div class="gt-panel">
+            <div class="gt-panel-title">
+              <span>器材清單</span>
+              <span id="deviceCount" style="font-size:0.72rem;font-weight:400;color:#5a6a7a;"></span>
+            </div>
+            <div class="gt-panel-body">
+              <form id="deviceForm" autocomplete="off" onsubmit="return false;">
+                <input type="hidden" id="deviceEditId" />
+                <div class="gt-form-row">
+                  <div class="form-group fg-name">
+                    <label for="deviceName">器材名稱 *</label>
+                    <input type="text" id="deviceName" placeholder="例如：踏步機" required />
+                  </div>
+                  <div class="form-group fg-note">
+                    <label for="deviceNote">備註</label>
+                    <input type="text" id="deviceNote" placeholder="選填" />
+                  </div>
+                  <div class="form-group" style="flex:0 0 auto;">
+                    <label>&nbsp;</label>
+                    <div style="display:flex;gap:0.3rem;">
+                      <button type="button" class="btn-primary btn-sm" id="btnSaveDevice">新增</button>
+                      <button type="button" class="btn-secondary btn-sm" id="btnCancelDevice" style="display:none;">取消</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <ul class="gt-list" id="deviceList"></ul>
+              <div id="deviceEmpty" class="empty" style="display:none;padding:0.8rem;">尚未新增器材</div>
+            </div>
+          </div>
+
+          <!-- Bookings -->
+          <div class="gt-panel">
+            <div class="gt-panel-title">
+              <span>使用預約</span>
+              <span id="bookingCount" style="font-size:0.72rem;font-weight:400;color:#5a6a7a;"></span>
+            </div>
+            <div class="gt-panel-body">
+              <div class="gt-conflict" id="bookingConflict"></div>
+              <form id="bookingForm" autocomplete="off" onsubmit="return false;">
+                <input type="hidden" id="bookingEditId" />
+                <div class="gt-form-row">
+                  <div class="form-group fg-select">
+                    <label for="bookingDevice">器材 *</label>
+                    <select id="bookingDevice" required></select>
+                  </div>
+                  <div class="form-group case-combo" style="flex:1 1 160px;">
+                    <label for="bookingCaseSearch">個案 *</label>
+                    <input type="text" id="bookingCaseSearch" placeholder="搜尋姓名…" autocomplete="off" />
+                    <input type="hidden" id="bookingCase" />
+                    <div class="case-combo-list" id="bookingCaseList"></div>
+                  </div>
+                  <div class="form-group fg-select">
+                    <label for="bookingWeekday">星期 *</label>
+                    <select id="bookingWeekday" required>
+                      <option value="">— 選擇 —</option>
+                      <option value="1">星期一</option>
+                      <option value="2">星期二</option>
+                      <option value="3">星期三</option>
+                      <option value="4">星期四</option>
+                      <option value="5">星期五</option>
+                      <option value="6">星期六</option>
+                    </select>
+                  </div>
+                  <div class="form-group fg-time">
+                    <label for="bookingStart">開始 *</label>
+                    <input type="time" id="bookingStart" required />
+                  </div>
+                  <div class="form-group fg-time">
+                    <label for="bookingEnd">結束 *</label>
+                    <input type="time" id="bookingEnd" required />
+                  </div>
+                  <div class="form-group fg-note">
+                    <label for="bookingNote">備註</label>
+                    <input type="text" id="bookingNote" placeholder="選填" />
+                  </div>
+                  <div class="form-group" style="flex:0 0 auto;">
+                    <label>&nbsp;</label>
+                    <div style="display:flex;gap:0.3rem;">
+                      <button type="button" class="btn-primary btn-sm" id="btnSaveBooking">預約</button>
+                      <button type="button" class="btn-secondary btn-sm" id="btnCancelBooking" style="display:none;">取消</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <div class="filters" style="margin-bottom:0.4rem;">
+                <select id="bookingFilterWeekday">
+                  <option value="">全部星期</option>
+                  <option value="1">星期一</option>
+                  <option value="2">星期二</option>
+                  <option value="3">星期三</option>
+                  <option value="4">星期四</option>
+                  <option value="5">星期五</option>
+                  <option value="6">星期六</option>
+                </select>
+                <button type="button" class="btn-secondary btn-sm" id="btnClearBookingFilter">顯示全部</button>
+              </div>
+              <ul class="gt-list" id="bookingList"></ul>
+              <div id="bookingEmpty" class="empty" style="display:none;padding:0.8rem;">暫無預約紀錄</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -598,6 +779,8 @@
     const TOKEN_KEY = 'ot_case_db_gh_token';
 
     let cases = [];
+    let devices = [];   // [{id, name, note}]
+    let bookings = [];  // [{id, deviceId, caseId, date, startTime, endTime, note}]
     let charts = { cognitive: null, ot: null, gerontech: null };
     let pendingAction = null;
     let fileSha = null;
@@ -683,23 +866,47 @@
 
     function isActive(c) { return c && c.status !== 'discharged'; }
 
-    function loadLocal() {
-      try {
-        var raw = localStorage.getItem(LOCAL_KEY);
-        // migrate from old key if needed
-        if (!raw) {
-          var old = localStorage.getItem('ot_case_db_v1');
-          if (old) {
-            raw = old;
-            localStorage.setItem(LOCAL_KEY, old);
-          }
-        }
-        cases = normalizeCases(raw ? JSON.parse(raw) : []);
-      } catch (e) { cases = []; }
+    function applyDocument(doc) {
+      if (Array.isArray(doc)) {
+        cases = normalizeCases(doc);
+        devices = devices || [];
+        bookings = bookings || [];
+        return;
+      }
+      if (!doc || typeof doc !== 'object') {
+        cases = [];
+        devices = [];
+        bookings = [];
+        return;
+      }
+      cases = normalizeCases(doc.cases || []);
+      devices = normalizeDevices(doc.devices || []);
+      bookings = normalizeBookings(doc.bookings || []);
     }
 
-    function saveLocal() {
-      localStorage.setItem(LOCAL_KEY, JSON.stringify(cases));
+    function buildDocument() {
+      return {
+        cases: cases,
+        devices: devices,
+        bookings: bookings
+      };
+    }
+
+    function normalizeDevices(arr) {
+      if (!Array.isArray(arr)) return [];
+      return arr.map(function (d) {
+        if (!d || typeof d !== 'object') return null;
+        var name = String(d.name || '').trim();
+        if (!name) return null;
+        return {
+          id: d.id || uid(),
+          name: name,
+          note: String(d.note || '').trim()
+        };
+      }).filter(Boolean);
+    }
+
+SON.stringify(buildDocument()));
     }
 
     async function pullFromGitHub() {
@@ -735,9 +942,11 @@
         fileSha = data.sha;
         var decoded = decodeBase64Utf8((data.content || '').replace(/\n/g, ''));
         var parsed = JSON.parse(decoded);
-        var remote = normalizeCases(Array.isArray(parsed) ? parsed : (parsed.cases || []));
+        var remoteCases = normalizeCases(Array.isArray(parsed) ? parsed : (parsed.cases || []));
+        var remoteDevices = Array.isArray(parsed) ? [] : normalizeDevices(parsed.devices || []);
+        var remoteBookings = Array.isArray(parsed) ? [] : normalizeBookings(parsed.bookings || []);
 
-        if (remote.length === 0 && cases.length > 0) {
+        if (remoteCases.length === 0 && cases.length > 0) {
           updateSyncUI('ok', '已連接（保留本機）');
           refreshAll();
           toast('GitHub 為空，已保留本機個案並上傳');
@@ -745,11 +954,13 @@
           return;
         }
 
-        cases = remote;
+        cases = remoteCases;
+        devices = remoteDevices;
+        bookings = remoteBookings;
         saveLocal();
         updateSyncUI('ok', '已同步 · ' + new Date().toLocaleTimeString('zh-HK'));
         refreshAll();
-        toast('已從 GitHub 載入 ' + cases.length + ' 筆');
+        toast('已從 GitHub 載入 ' + cases.length + ' 筆個案');
       } catch (e) {
         console.error(e);
         updateSyncUI('err', '同步失敗');
@@ -782,7 +993,7 @@
           throw new Error('無法取得檔案狀態');
         }
 
-        var content = encodeBase64Utf8(JSON.stringify(cases, null, 2));
+        var content = encodeBase64Utf8(JSON.stringify(buildDocument(), null, 2));
         var body = {
           message: message || ('更新個案 ' + new Date().toISOString()),
           content: content,
@@ -1013,6 +1224,7 @@
       renderTable();
       renderCharts();
       renderReviewByMonth();
+      renderGerontech();
     }
 
     function renderStats() {
@@ -1063,110 +1275,127 @@
       box.style.display = 'block';
     }
 
-    // Filter state (not stored in <select>, so browser cannot restore wrong value)
-    var currentStatusFilter = 'active';
+    // Default: show ALL cases (no「在籍」button). Filters only narrow the list.
+    var currentStatusFilter = 'all';
 
     function setStatusFilter(f) {
-      currentStatusFilter = f || 'active';
+      currentStatusFilter = f || 'all';
       var btns = document.querySelectorAll('#filterStatusBtns .filter-btn');
       for (var i = 0; i < btns.length; i++) {
-        if (btns[i].getAttribute('data-filter') === currentStatusFilter) {
-          btns[i].classList.add('active');
-        } else {
-          btns[i].classList.remove('active');
-        }
+        var on = btns[i].getAttribute('data-filter') === currentStatusFilter;
+        if (on) btns[i].classList.add('is-on');
+        else btns[i].classList.remove('is-on');
       }
       renderTable();
     }
 
     function renderTable() {
-      var cogFilter = '';
-      var search = '';
       try {
-        var fc = document.getElementById('filterCognitive');
-        var sn = document.getElementById('searchName');
-        if (fc && fc.value) cogFilter = fc.value;
-        if (sn && sn.value) search = sn.value.trim().toLowerCase();
-      } catch (e) {}
+        var cogFilter = '';
+        var search = '';
+        try {
+          var fc = document.getElementById('filterCognitive');
+          var sn = document.getElementById('searchName');
+          if (fc && fc.value) cogFilter = fc.value;
+          if (sn && sn.value) search = sn.value.trim().toLowerCase();
+        } catch (e1) {}
 
-      var statusFilter = currentStatusFilter || 'active';
-      var list = Array.isArray(cases) ? cases.slice() : [];
-      var totalAll = list.length;
-      var totalActive = list.filter(isActive).length;
-
-      if (statusFilter === 'active') list = list.filter(isActive);
-      else if (statusFilter === 'discharged') list = list.filter(function (c) { return c.status === 'discharged'; });
-      else if (statusFilter === 'due') {
-        list = list.filter(function (c) {
-          return isActive(c) && (getReviewStatus(c) === 'due' || getReviewStatus(c) === 'overdue');
-        });
-      }
-      if (cogFilter) list = list.filter(function (c) { return c.cognitive === cogFilter; });
-      if (search) list = list.filter(function (c) { return (c.name || '').toLowerCase().indexOf(search) !== -1; });
-
-      // Safety net: if filters hid everything but we still have active cases,
-      // fall back to showing all active (prevents "sudden empty list")
-      if (!list.length && totalActive > 0 && (statusFilter !== 'discharged') && !cogFilter && !search) {
-        if (statusFilter === 'due') {
-          // genuine empty due-list — ok
-        } else {
-          list = cases.filter(isActive);
-          statusFilter = 'active';
-          currentStatusFilter = 'active';
+        // Always read from global cases — never clear it here
+        var source = Array.isArray(cases) ? cases : [];
+        // Repair missing ids so rows always render
+        for (var ri = 0; ri < source.length; ri++) {
+          if (source[ri] && !source[ri].id) source[ri].id = uid();
+          if (source[ri] && source[ri].status !== 'discharged') source[ri].status = 'active';
         }
+
+        var statusFilter = currentStatusFilter || 'all';
+        var list = source.slice();
+        var totalAll = list.length;
+        var totalActive = 0;
+        for (var ai = 0; ai < list.length; ai++) {
+          if (isActive(list[ai])) totalActive++;
+        }
+
+        if (statusFilter === 'discharged') {
+          list = list.filter(function (c) { return c && c.status === 'discharged'; });
+        } else if (statusFilter === 'due') {
+          list = list.filter(function (c) {
+            return isActive(c) && (getReviewStatus(c) === 'due' || getReviewStatus(c) === 'overdue');
+          });
+        } else if (statusFilter === 'active') {
+          list = list.filter(isActive);
+        }
+        // statusFilter === 'all' → no status filter
+
+        if (cogFilter) {
+          list = list.filter(function (c) { return c && c.cognitive === cogFilter; });
+        }
+        if (search) {
+          list = list.filter(function (c) {
+            return c && (c.name || '').toLowerCase().indexOf(search) !== -1;
+          });
+        }
+
+        list.sort(function (a, b) {
+          var da = (a && a.admissionDate) || '';
+          var db = (b && b.admissionDate) || '';
+          if (da !== db) return da < db ? -1 : 1;
+          return ((a && a.name) || '').localeCompare((b && b.name) || '', 'zh-HK');
+        });
+
+        var tbody = document.getElementById('caseTableBody');
+        var empty = document.getElementById('emptyMsg');
+        var countEl = document.getElementById('listCount');
+        var dbg = document.getElementById('tableDebug');
+        if (countEl) countEl.textContent = '（' + list.length + '）';
+        if (dbg) {
+          dbg.textContent = '資料庫: ' + totalAll + ' · 在籍: ' + totalActive + ' · 顯示: ' + list.length +
+            ' · 篩選: ' + statusFilter;
+        }
+        if (!tbody) return;
+
+        if (!list.length) {
+          tbody.innerHTML = '';
+          if (empty) empty.style.display = 'block';
+          return;
+        }
+        if (empty) empty.style.display = 'none';
+
+        var html = '';
+        for (var i = 0; i < list.length; i++) {
+          var c = list[i];
+          if (!c) continue;
+          var cid = c.id || ('tmp' + i);
+          var status = getReviewStatus(c);
+          var due = nextReviewDue(c.icpDate);
+          html += '<tr data-id="' + escapeHtml(cid) + '">' +
+            '<td><strong>' + escapeHtml(c.name || '') + '</strong></td>' +
+            '<td>' + formatDate(c.admissionDate) + '</td>' +
+            '<td>' + formatDate(c.icpDate) + '</td>' +
+            '<td>' + (isActive(c) ? formatDate(due) : '—') + '</td>' +
+            '<td>' + statusLabel(status) + '</td>' +
+            '<td>' + cogBadge(c.cognitive) + '</td>' +
+            '<td>' + ynBadge(c.otTraining) + '</td>' +
+            '<td>' + ynBadge(c.gerontech) + '</td>' +
+            '<td class="no-print" style="white-space:nowrap;">' +
+              '<button type="button" class="btn-success btn-sm" data-act="review" data-id="' + escapeHtml(cid) + '">覆核</button> ' +
+              '<button type="button" class="btn-secondary btn-sm" data-act="edit" data-id="' + escapeHtml(cid) + '">編輯</button> ' +
+              '<button type="button" class="btn-danger btn-sm" data-act="delete" data-id="' + escapeHtml(cid) + '">刪除</button>' +
+            '</td></tr>';
+        }
+        tbody.innerHTML = html;
+      } catch (err) {
+        console.error('renderTable error', err);
+        toast('列表顯示錯誤: ' + (err && err.message ? err.message : err));
       }
-
-      list.sort(function (a, b) {
-        var da = a.admissionDate || '';
-        var db = b.admissionDate || '';
-        if (da !== db) return da < db ? -1 : 1;
-        return (a.name || '').localeCompare(b.name || '', 'zh-HK');
-      });
-
-      var tbody = document.getElementById('caseTableBody');
-      var empty = document.getElementById('emptyMsg');
-      var countEl = document.getElementById('listCount');
-      var dbg = document.getElementById('tableDebug');
-      if (countEl) countEl.textContent = list.length ? '（' + list.length + '）' : '';
-      if (dbg) dbg.textContent = '資料庫: ' + totalAll + ' · 在籍: ' + totalActive + ' · 顯示: ' + list.length;
-      if (!tbody) return;
-
-      if (!list.length) {
-        tbody.innerHTML = '';
-        if (empty) empty.style.display = 'block';
-        return;
-      }
-      if (empty) empty.style.display = 'none';
-
-      var rows = [];
-      for (var i = 0; i < list.length; i++) {
-        var c = list[i];
-        if (!c || !c.id) continue;
-        var status = getReviewStatus(c);
-        var due = nextReviewDue(c.icpDate);
-        rows.push(
-          '<tr data-id="' + escapeHtml(c.id) + '">' +
-          '<td><strong>' + escapeHtml(c.name) + '</strong></td>' +
-          '<td>' + formatDate(c.admissionDate) + '</td>' +
-          '<td>' + formatDate(c.icpDate) + '</td>' +
-          '<td>' + (isActive(c) ? formatDate(due) : '—') + '</td>' +
-          '<td>' + statusLabel(status) + '</td>' +
-          '<td>' + cogBadge(c.cognitive) + '</td>' +
-          '<td>' + ynBadge(c.otTraining) + '</td>' +
-          '<td>' + ynBadge(c.gerontech) + '</td>' +
-          '<td class="no-print" style="white-space:nowrap;">' +
-            '<button type="button" class="btn-success btn-sm" data-act="review" data-id="' + escapeHtml(c.id) + '">覆核</button> ' +
-            '<button type="button" class="btn-secondary btn-sm" data-act="edit" data-id="' + escapeHtml(c.id) + '">編輯</button> ' +
-            '<button type="button" class="btn-danger btn-sm" data-act="delete" data-id="' + escapeHtml(c.id) + '">刪除</button>' +
-          '</td></tr>'
-        );
-      }
-      tbody.innerHTML = rows.join('');
     }
 
-        document.getElementById('caseTableBody').addEventListener('click', function (e) {
+    // Single delegated listener (register once)
+    document.getElementById('caseTableBody').addEventListener('click', function (e) {
       var btn = e.target.closest('button[data-act]');
       if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
       var id = btn.getAttribute('data-id');
       var act = btn.getAttribute('data-act');
       if (act === 'review') askReview(id);
@@ -1323,7 +1552,384 @@
       }).join('');
     }
 
+
+    // ---------- Gerontech devices & bookings ----------
+    function getDeviceName(id) {
+      var d = devices.find(function (x) { return x.id === id; });
+      return d ? d.name : '（已刪器材）';
+    }
+    function getCaseName(id) {
+      var c = cases.find(function (x) { return x.id === id; });
+      return c ? c.name : '（已刪個案）';
+    }
+
+    /** time strings "HH:MM" -> minutes */
+    function timeToMin(t) {
+      if (!t) return 0;
+      var p = t.split(':');
+      return (parseInt(p[0], 10) || 0) * 60 + (parseInt(p[1], 10) || 0);
+    }
+
+    var WEEKDAY_LABELS = { '1': '星期一', '2': '星期二', '3': '星期三', '4': '星期四', '5': '星期五', '6': '星期六' };
+
+    function weekdayLabel(w) {
+      return WEEKDAY_LABELS[String(w)] || ('星期' + w);
+    }
+
+    /** Normalize booking: support old date field → drop; use weekday 1-6 */
+    function normalizeBookings(arr) {
+      if (!Array.isArray(arr)) return [];
+      return arr.map(function (b) {
+        if (!b || typeof b !== 'object') return null;
+        var wd = b.weekday != null ? String(b.weekday) : '';
+        // migrate: if only date exists, skip invalid weekday (user re-enters)
+        if (!wd && b.date) {
+          try {
+            var d = new Date(b.date + 'T00:00:00');
+            var jsDay = d.getDay(); // 0 Sun .. 6 Sat
+            if (jsDay >= 1 && jsDay <= 6) wd = String(jsDay);
+          } catch (e) {}
+        }
+        if (!b.deviceId || !b.caseId || !wd || !b.startTime || !b.endTime) return null;
+        if (['1','2','3','4','5','6'].indexOf(wd) === -1) return null;
+        return {
+          id: b.id || uid(),
+          deviceId: b.deviceId,
+          caseId: b.caseId,
+          weekday: wd,
+          startTime: b.startTime,
+          endTime: b.endTime,
+          note: String(b.note || '').trim()
+        };
+      }).filter(Boolean);
+    }
+
+    /** Overlap: same device, same weekday, intersecting times */
+    function findBookingConflict(deviceId, weekday, startTime, endTime, excludeId) {
+      var s = timeToMin(startTime);
+      var e = timeToMin(endTime);
+      if (e <= s) return { error: '結束時間必須晚於開始時間' };
+      var wd = String(weekday);
+      for (var i = 0; i < bookings.length; i++) {
+        var b = bookings[i];
+        if (excludeId && b.id === excludeId) continue;
+        if (b.deviceId !== deviceId || String(b.weekday) !== wd) continue;
+        var bs = timeToMin(b.startTime);
+        var be = timeToMin(b.endTime);
+        if (s < be && e > bs) {
+          return {
+            error: '與現有預約重疊：' + getCaseName(b.caseId) + ' ' + weekdayLabel(wd) + ' ' + b.startTime + '–' + b.endTime,
+            booking: b
+          };
+        }
+      }
+      return null;
+    }
+
+    function renderGerontech() {
+      renderDeviceList();
+      fillBookingSelects();
+      renderBookingList();
+    }
+
+    function renderDeviceList() {
+      var list = document.getElementById('deviceList');
+      var empty = document.getElementById('deviceEmpty');
+      var count = document.getElementById('deviceCount');
+      if (count) count.textContent = devices.length ? devices.length + ' 件' : '';
+      if (!devices.length) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+      var sorted = devices.slice().sort(function (a, b) {
+        return a.name.localeCompare(b.name, 'zh-HK');
+      });
+      list.innerHTML = sorted.map(function (d) {
+        var useCount = bookings.filter(function (b) { return b.deviceId === d.id; }).length;
+        return '<li data-id="' + escapeHtml(d.id) + '">' +
+          '<div class="gt-main"><div class="gt-name">' + escapeHtml(d.name) + '</div>' +
+          '<div class="gt-meta">' + (d.note ? escapeHtml(d.note) + ' · ' : '') + '預約 ' + useCount + ' 次</div></div>' +
+          '<div class="gt-actions">' +
+          '<button type="button" class="btn-secondary btn-sm" data-act="edit-device" data-id="' + escapeHtml(d.id) + '">編輯</button> ' +
+          '<button type="button" class="btn-danger btn-sm" data-act="del-device" data-id="' + escapeHtml(d.id) + '">刪除</button>' +
+          '</div></li>';
+      }).join('');
+    }
+
+    function fillBookingSelects() {
+      var devSel = document.getElementById('bookingDevice');
+      var curDev = devSel.value;
+      var devOpts = devices.slice().sort(function (a, b) {
+        return a.name.localeCompare(b.name, 'zh-HK');
+      }).map(function (d) {
+        return '<option value="' + escapeHtml(d.id) + '">' + escapeHtml(d.name) + '</option>';
+      });
+      devSel.innerHTML = '<option value="">— 選擇器材 —</option>' + devOpts.join('');
+      if (curDev) devSel.value = curDev;
+      // case list is handled by searchable combo
+      renderCaseComboList();
+    }
+
+    function getActiveCasesSorted() {
+      return cases.filter(isActive).sort(function (a, b) {
+        return (a.name || '').localeCompare(b.name || '', 'zh-HK');
+      });
+    }
+
+    function renderCaseComboList(filterText) {
+      var box = document.getElementById('bookingCaseList');
+      if (!box) return;
+      var q = (filterText || '').trim().toLowerCase();
+      var list = getActiveCasesSorted();
+      if (q) {
+        list = list.filter(function (c) {
+          return (c.name || '').toLowerCase().indexOf(q) !== -1;
+        });
+      }
+      if (!list.length) {
+        box.innerHTML = '<div style="color:#5a6a7a;cursor:default;">無符合個案</div>';
+        return;
+      }
+      box.innerHTML = list.map(function (c) {
+        return '<div data-id="' + escapeHtml(c.id) + '" data-name="' + escapeHtml(c.name) + '">' +
+          escapeHtml(c.name) + '</div>';
+      }).join('');
+    }
+
+    function openCaseCombo() {
+      renderCaseComboList(document.getElementById('bookingCaseSearch').value);
+      document.getElementById('bookingCaseList').classList.add('show');
+    }
+    function closeCaseCombo() {
+      document.getElementById('bookingCaseList').classList.remove('show');
+    }
+    function selectBookingCase(id, name) {
+      document.getElementById('bookingCase').value = id || '';
+      document.getElementById('bookingCaseSearch').value = name || '';
+      closeCaseCombo();
+    }
+
+    function renderBookingList() {
+      var list = document.getElementById('bookingList');
+      var empty = document.getElementById('bookingEmpty');
+      var count = document.getElementById('bookingCount');
+      var filterWd = (document.getElementById('bookingFilterWeekday').value || '').trim();
+
+      var rows = bookings.slice();
+      if (filterWd) {
+        rows = rows.filter(function (b) { return String(b.weekday) === filterWd; });
+      }
+      rows.sort(function (a, b) {
+        var wa = parseInt(a.weekday, 10) || 0;
+        var wb = parseInt(b.weekday, 10) || 0;
+        if (wa !== wb) return wa - wb;
+        if (a.startTime !== b.startTime) return a.startTime < b.startTime ? -1 : 1;
+        return getDeviceName(a.deviceId).localeCompare(getDeviceName(b.deviceId), 'zh-HK');
+      });
+
+      if (count) count.textContent = rows.length ? rows.length + ' 筆' : '';
+      if (!rows.length) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      list.innerHTML = rows.map(function (b) {
+        var meta = weekdayLabel(b.weekday) + ' · ' + b.startTime + '–' + b.endTime;
+        if (b.note) meta += ' · ' + escapeHtml(b.note);
+        return '<li data-id="' + escapeHtml(b.id) + '">' +
+          '<div class="gt-main">' +
+          '<div class="gt-name"><span class="badge badge-device">' + escapeHtml(getDeviceName(b.deviceId)) + '</span> ' +
+          escapeHtml(getCaseName(b.caseId)) + '</div>' +
+          '<div class="gt-meta">' + meta + '</div></div>' +
+          '<div class="gt-actions">' +
+          '<button type="button" class="btn-secondary btn-sm" data-act="edit-booking" data-id="' + escapeHtml(b.id) + '">編輯</button> ' +
+          '<button type="button" class="btn-danger btn-sm" data-act="del-booking" data-id="' + escapeHtml(b.id) + '">刪除</button>' +
+          '</div></li>';
+      }).join('');
+    }
+
+    function resetDeviceForm() {
+      document.getElementById('deviceEditId').value = '';
+      document.getElementById('deviceName').value = '';
+      document.getElementById('deviceNote').value = '';
+      document.getElementById('btnSaveDevice').textContent = '新增';
+      document.getElementById('btnCancelDevice').style.display = 'none';
+    }
+
+    function resetBookingForm() {
+      document.getElementById('bookingEditId').value = '';
+      document.getElementById('bookingDevice').value = '';
+      document.getElementById('bookingCase').value = '';
+      document.getElementById('bookingCaseSearch').value = '';
+      document.getElementById('bookingWeekday').value = '';
+      document.getElementById('bookingStart').value = '';
+      document.getElementById('bookingEnd').value = '';
+      document.getElementById('bookingNote').value = '';
+      document.getElementById('btnSaveBooking').textContent = '預約';
+      document.getElementById('btnCancelBooking').style.display = 'none';
+      document.getElementById('bookingConflict').classList.remove('show');
+      document.getElementById('bookingConflict').textContent = '';
+      closeCaseCombo();
+    }
+
+    async function saveDevice() {
+      var name = document.getElementById('deviceName').value.trim();
+      var note = document.getElementById('deviceNote').value.trim();
+      var editId = document.getElementById('deviceEditId').value;
+      if (!name) { toast('請輸入器材名稱'); return; }
+      // unique name (case-insensitive)
+      var dup = devices.find(function (d) {
+        return d.name.toLowerCase() === name.toLowerCase() && d.id !== editId;
+      });
+      if (dup) { toast('已有相同名稱的器材'); return; }
+
+      if (editId) {
+        var idx = devices.findIndex(function (d) { return d.id === editId; });
+        if (idx === -1) return;
+        devices[idx] = { id: editId, name: name, note: note };
+        await persist('更新器材: ' + name);
+        toast('器材已更新');
+      } else {
+        devices.push({ id: uid(), name: name, note: note });
+        await persist('新增器材: ' + name);
+        toast('器材已新增');
+      }
+      resetDeviceForm();
+      renderGerontech();
+    }
+
+    function editDevice(id) {
+      var d = devices.find(function (x) { return x.id === id; });
+      if (!d) return;
+      document.getElementById('deviceEditId').value = d.id;
+      document.getElementById('deviceName').value = d.name;
+      document.getElementById('deviceNote').value = d.note || '';
+      document.getElementById('btnSaveDevice').textContent = '更新';
+      document.getElementById('btnCancelDevice').style.display = 'inline-block';
+    }
+
+    function deleteDevice(id) {
+      var d = devices.find(function (x) { return x.id === id; });
+      if (!d) return;
+      var related = bookings.filter(function (b) { return b.deviceId === id; }).length;
+      var msg = related
+        ? '確定刪除器材「' + d.name + '」？將同時刪除 ' + related + ' 筆相關預約。'
+        : '確定刪除器材「' + d.name + '」？';
+      openModal('刪除器材', msg, async function () {
+        devices = devices.filter(function (x) { return x.id !== id; });
+        bookings = bookings.filter(function (b) { return b.deviceId !== id; });
+        await persist('刪除器材: ' + d.name);
+        resetDeviceForm();
+        renderGerontech();
+        toast('器材已刪除');
+      }, true);
+    }
+
+    async function saveBooking() {
+      var deviceId = document.getElementById('bookingDevice').value;
+      var caseId = document.getElementById('bookingCase').value;
+      var weekday = document.getElementById('bookingWeekday').value;
+      var startTime = document.getElementById('bookingStart').value;
+      var endTime = document.getElementById('bookingEnd').value;
+      var note = document.getElementById('bookingNote').value.trim();
+      var editId = document.getElementById('bookingEditId').value;
+      var conflictBox = document.getElementById('bookingConflict');
+
+      if (!deviceId || !caseId || !weekday || !startTime || !endTime) {
+        toast('請填寫器材、個案、星期與時段');
+        return;
+      }
+      var conflict = findBookingConflict(deviceId, weekday, startTime, endTime, editId || null);
+      if (conflict) {
+        conflictBox.textContent = '⚠ ' + conflict.error;
+        conflictBox.classList.add('show');
+        toast(conflict.error);
+        return;
+      }
+      conflictBox.classList.remove('show');
+
+      if (editId) {
+        var idx = bookings.findIndex(function (b) { return b.id === editId; });
+        if (idx === -1) return;
+        bookings[idx] = {
+          id: editId, deviceId: deviceId, caseId: caseId,
+          weekday: String(weekday), startTime: startTime, endTime: endTime, note: note
+        };
+        await persist('更新預約');
+        toast('預約已更新');
+      } else {
+        bookings.push({
+          id: uid(), deviceId: deviceId, caseId: caseId,
+          weekday: String(weekday), startTime: startTime, endTime: endTime, note: note
+        });
+        await persist('新增預約');
+        toast('預約已新增');
+      }
+      resetBookingForm();
+      renderGerontech();
+    }
+
+    function editBooking(id) {
+      var b = bookings.find(function (x) { return x.id === id; });
+      if (!b) return;
+      fillBookingSelects();
+      document.getElementById('bookingEditId').value = b.id;
+      document.getElementById('bookingDevice').value = b.deviceId;
+      document.getElementById('bookingCase').value = b.caseId;
+      document.getElementById('bookingCaseSearch').value = getCaseName(b.caseId);
+      document.getElementById('bookingWeekday').value = String(b.weekday);
+      document.getElementById('bookingStart').value = b.startTime;
+      document.getElementById('bookingEnd').value = b.endTime;
+      document.getElementById('bookingNote').value = b.note || '';
+      document.getElementById('btnSaveBooking').textContent = '更新';
+      document.getElementById('btnCancelBooking').style.display = 'inline-block';
+      document.getElementById('bookingConflict').classList.remove('show');
+    }
+
+    function deleteBooking(id) {
+      var b = bookings.find(function (x) { return x.id === id; });
+      if (!b) return;
+      openModal('刪除預約',
+        '確定刪除預約？\\n' + getDeviceName(b.deviceId) + ' · ' + getCaseName(b.caseId) +
+        ' · ' + weekdayLabel(b.weekday) + ' ' + b.startTime + '–' + b.endTime,
+        async function () {
+          bookings = bookings.filter(function (x) { return x.id !== id; });
+          await persist('刪除預約');
+          resetBookingForm();
+          renderGerontech();
+          toast('預約已刪除');
+        }, true);
+    }
+
+    // Device / booking UI events
+    document.getElementById('btnSaveDevice').addEventListener('click', function () { saveDevice(); });
+    document.getElementById('btnCancelDevice').addEventListener('click', function () { resetDeviceForm(); });
+    document.getElementById('btnSaveBooking').addEventListener('click', function () { saveBooking(); });
+    document.getElementById('btnCancelBooking').addEventListener('click', function () { resetBookingForm(); });
+
+    document.getElementById('deviceList').addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-act]');
+      if (!btn) return;
+      var id = btn.getAttribute('data-id');
+      var act = btn.getAttribute('data-act');
+      if (act === 'edit-device') editDevice(id);
+      else if (act === 'del-device') deleteDevice(id);
+    });
+    document.getElementById('bookingList').addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-act]');
+      if (!btn) return;
+      var id = btn.getAttribute('data-id');
+      var act = btn.getAttribute('data-act');
+      if (act === 'edit-booking') editBooking(id);
+      else if (act === 'del-booking') deleteBooking(id);
+    });
+
     function printPage() { window.print(); }
+
 
     function exportCSV() {
       var headers = ['姓名', '入會日期', 'ICP Date', '認知水平', 'OT Training', '使用Gerontech', '狀態', '離院日期'];
@@ -1399,46 +2005,64 @@
       reader.readAsText(file, 'UTF-8');
     }
 
-    // Filter controls
+    // Filter controls — stopPropagation so nothing else eats the click
     document.getElementById('filterStatusBtns').addEventListener('click', function (e) {
-      var btn = e.target.closest('.filter-btn');
+      var btn = e.target.closest('button.filter-btn');
       if (!btn) return;
-      setStatusFilter(btn.getAttribute('data-filter'));
+      e.preventDefault();
+      e.stopPropagation();
+      var f = btn.getAttribute('data-filter') || 'all';
+      setStatusFilter(f);
     });
     document.getElementById('filterCognitive').addEventListener('change', function () { renderTable(); });
     document.getElementById('searchName').addEventListener('input', function () { renderTable(); });
 
-    // Re-render if browser restores page from cache with empty table
-    window.addEventListener('pageshow', function () {
-      currentStatusFilter = 'active';
-      setStatusFilter('active');
-      if (cases.length) refreshAll();
+    // Case search combo
+    document.getElementById('bookingCaseSearch').addEventListener('focus', function () { openCaseCombo(); });
+    document.getElementById('bookingCaseSearch').addEventListener('input', function () {
+      document.getElementById('bookingCase').value = '';
+      openCaseCombo();
+    });
+    document.getElementById('bookingCaseList').addEventListener('mousedown', function (e) {
+      var row = e.target.closest('div[data-id]');
+      if (!row) return;
+      e.preventDefault();
+      selectBookingCase(row.getAttribute('data-id'), row.getAttribute('data-name'));
+    });
+    document.addEventListener('click', function (e) {
+      var combo = e.target.closest('.case-combo');
+      if (!combo) closeCaseCombo();
     });
 
-    // Watchdog: if we have cases but table body is empty, force re-render
+    document.getElementById('btnClearBookingFilter').addEventListener('click', function () {
+      document.getElementById('bookingFilterWeekday').value = '';
+      renderBookingList();
+    });
+    document.getElementById('bookingFilterWeekday').addEventListener('change', function () { renderBookingList(); });
+
+    window.addEventListener('pageshow', function () {
+      if (cases.length) renderTable();
+    });
+
+    // Watchdog: restore table if data exists but DOM emptied
     setInterval(function () {
       try {
         var tbody = document.getElementById('caseTableBody');
-        var activeCount = cases.filter(isActive).length;
-        if (activeCount > 0 && tbody && tbody.children.length === 0 && currentStatusFilter === 'active') {
-          var sn = document.getElementById('searchName');
-          var fc = document.getElementById('filterCognitive');
-          if (sn) sn.value = '';
-          if (fc) fc.value = '';
+        if (cases.length > 0 && tbody && tbody.children.length === 0) {
           renderTable();
         }
       } catch (e) {}
-    }, 2000);
+    }, 1500);
 
     (async function init() {
-      currentStatusFilter = 'active';
+      currentStatusFilter = 'all';
       loadLocal();
       refreshAll();
+      setStatusFilter('all');
       if (getToken()) {
         await pullFromGitHub();
-        // After sync, force active filter again
-        currentStatusFilter = 'active';
-        setStatusFilter('active');
+        currentStatusFilter = 'all';
+        setStatusFilter('all');
       } else {
         updateSyncUI('local', '本機模式');
       }
