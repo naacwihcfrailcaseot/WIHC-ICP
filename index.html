@@ -906,7 +906,26 @@
       }).filter(Boolean);
     }
 
-SON.stringify(buildDocument()));
+    function loadLocal() {
+      try {
+        var raw = localStorage.getItem(LOCAL_KEY);
+        if (!raw) {
+          var old = localStorage.getItem('ot_case_db_v1');
+          if (old) {
+            raw = old;
+            localStorage.setItem(LOCAL_KEY, old);
+          }
+        }
+        applyDocument(raw ? JSON.parse(raw) : { cases: [], devices: [], bookings: [] });
+      } catch (e) {
+        cases = [];
+        devices = [];
+        bookings = [];
+      }
+    }
+
+    function saveLocal() {
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(buildDocument()));
     }
 
     async function pullFromGitHub() {
