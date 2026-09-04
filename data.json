@@ -916,7 +916,32 @@
       "id": "mtmc22g1ntvasp",
       "name": "GoPod",
       "note": ""
+    },
+    {
+      "id": "mtmc2bg4l32cm8",
+      "name": "FitMi",
+      "note": ""
+    },
+    {
+      "id": "mtmc2hizsnb4al",
+      "name": "Music Glove",
+      "note": ""
+    },
+    {
+      "id": "mtmc2ntvx9sn5w",
+      "name": "板琴",
+      "note": ""
     }
   ],
-  "bookings": []
+  "bookings": [
+    {
+      "id": "mtmcas274qspmr",
+      "deviceId": "mtmc22g1ntvasp",
+      "caseId": "mtgzwwulu462wo",
+      "weekday": "2",
+      "startTime": "11:00",
+      "endTime": "12:00",
+      "note": ""
+    }
+  ]
 }
