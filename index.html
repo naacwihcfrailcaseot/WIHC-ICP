@@ -562,7 +562,9 @@
             <option value="Major NCD">Major NCD</option>
             <option value="Dementia">Dementia</option>
           </select>
-          <input type="text" id="searchName" placeholder="搜尋姓名…" style="min-width:120px;" autocomplete="off" />
+          <input type="text" id="searchName" name="caseListSearch" placeholder="搜尋姓名…" style="min-width:120px;"
+                 autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+                 value="" data-lpignore="true" data-form-type="other" />
           <span id="tableDebug" style="font-size:0.72rem;color:#5a6a7a;margin-left:0.25rem;"></span>
         </div>
         <div class="table-wrap">
@@ -1297,6 +1299,30 @@
     // Default: show ALL cases (no「在籍」button). Filters only narrow the list.
     var currentStatusFilter = 'all';
 
+    /** Values browsers often autofill that are NOT case names */
+    function isJunkSearch(v) {
+      if (!v) return false;
+      var s = String(v).trim().toLowerCase();
+      if (!s) return false;
+      var junk = ['wihc-icp', 'wihc_icp', 'wihc', 'case-database', 'case_database',
+        'github', 'naacwihcfrailcaseot', 'index.html', 'localhost'];
+      for (var i = 0; i < junk.length; i++) {
+        if (s === junk[i] || s.indexOf(junk[i]) !== -1) return true;
+      }
+      // repo-like tokens
+      if (/^[a-z0-9_-]+\/(main|master)/i.test(s)) return true;
+      return false;
+    }
+
+    function clearCaseSearchBox() {
+      var sn = document.getElementById('searchName');
+      if (sn && (isJunkSearch(sn.value) || sn.value)) {
+        // Only auto-clear known junk on load; user may type real names later
+        if (isJunkSearch(sn.value)) sn.value = '';
+      }
+    }
+
+
     function setStatusFilter(f) {
       currentStatusFilter = f || 'all';
       var btns = document.querySelectorAll('#filterStatusBtns .filter-btn');
@@ -1316,7 +1342,15 @@
           var fc = document.getElementById('filterCognitive');
           var sn = document.getElementById('searchName');
           if (fc && fc.value) cogFilter = fc.value;
-          if (sn && sn.value) search = sn.value.trim().toLowerCase();
+          if (sn) {
+            // Browser often autofills repo/site name into this box — ignore/clear it
+            var rawSearch = (sn.value || '').trim();
+            if (isJunkSearch(rawSearch)) {
+              sn.value = '';
+              rawSearch = '';
+            }
+            search = rawSearch.toLowerCase();
+          }
         } catch (e1) {}
 
         // Always read from global cases — never clear it here
@@ -2060,6 +2094,7 @@
     document.getElementById('bookingFilterWeekday').addEventListener('change', function () { renderBookingList(); });
 
     window.addEventListener('pageshow', function () {
+      clearCaseSearchBox();
       if (cases.length) renderTable();
     });
 
@@ -2075,6 +2110,11 @@
 
     (async function init() {
       currentStatusFilter = 'all';
+      clearCaseSearchBox();
+      // Clear again shortly after load (some browsers autofill late)
+      setTimeout(clearCaseSearchBox, 100);
+      setTimeout(function () { clearCaseSearchBox(); renderTable(); }, 500);
+      setTimeout(function () { clearCaseSearchBox(); renderTable(); }, 1500);
       loadLocal();
       refreshAll();
       setStatusFilter('all');
