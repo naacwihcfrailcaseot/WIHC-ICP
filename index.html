@@ -423,19 +423,64 @@
         print-color-adjust: exact;
       }
       .stats-bar { break-inside: avoid; page-break-inside: avoid; }
-      .list-card, .review-schedule, .chart-wrap {
+      .list-card, .review-schedule {
         break-inside: avoid; page-break-inside: avoid;
         box-shadow: none !important; border: 1px solid #ccc;
       }
+      /* Charts: enough height for pie + legend numbers; do not clip */
       .charts {
-        break-inside: avoid; page-break-inside: avoid;
-        grid-template-columns: repeat(3, 1fr);
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
+        margin: 8px 0 16px 0 !important;
+        padding-bottom: 8px !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        page-break-after: auto;
+        overflow: visible !important;
       }
-      .chart-wrap { height: 220px; }
+      .chart-wrap {
+        height: 320px !important;
+        min-height: 320px !important;
+        max-height: none !important;
+        padding: 8px 6px 12px 6px !important;
+        overflow: visible !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      .chart-wrap h3 {
+        font-size: 10pt !important;
+        margin-bottom: 4px !important;
+        flex-shrink: 0 !important;
+      }
+      .chart-canvas-box {
+        flex: 1 1 auto !important;
+        min-height: 260px !important;
+        height: 260px !important;
+        overflow: visible !important;
+        position: relative !important;
+      }
+      .chart-canvas-box canvas {
+        max-height: 100% !important;
+      }
+      /* Keep following sections from overlapping chart legends */
+      .gt-section {
+        margin-top: 12px !important;
+        page-break-before: auto;
+        break-inside: avoid;
+      }
       table { font-size: 9pt; }
       th, td { padding: 0.3rem 0.35rem; }
       .month-card { break-inside: avoid; page-break-inside: avoid; }
       a { text-decoration: none; color: inherit; }
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
     }
   </style>
 </head>
@@ -1981,7 +2026,51 @@
       else if (act === 'del-booking') deleteBooking(id);
     });
 
-    function printPage() { window.print(); }
+    function printPage() {
+      // Temporarily enlarge chart boxes so Chart.js legend (with numbers) is fully visible
+      var wraps = document.querySelectorAll('.chart-wrap');
+      var boxes = document.querySelectorAll('.chart-canvas-box');
+      var prev = [];
+      for (var i = 0; i < wraps.length; i++) {
+        prev.push({ h: wraps[i].style.height, o: wraps[i].style.overflow });
+        wraps[i].style.height = '340px';
+        wraps[i].style.overflow = 'visible';
+      }
+      for (var j = 0; j < boxes.length; j++) {
+        boxes[j].style.minHeight = '280px';
+        boxes[j].style.height = '280px';
+      }
+      // Force Chart.js to reflow
+      try {
+        if (charts.cognitive) charts.cognitive.resize();
+        if (charts.ot) charts.ot.resize();
+        if (charts.gerontech) charts.gerontech.resize();
+      } catch (e) {}
+
+      var restored = false;
+      function restore() {
+        if (restored) return;
+        restored = true;
+        for (var i = 0; i < wraps.length; i++) {
+          wraps[i].style.height = prev[i] ? prev[i].h : '';
+          wraps[i].style.overflow = prev[i] ? prev[i].o : '';
+        }
+        for (var j = 0; j < boxes.length; j++) {
+          boxes[j].style.minHeight = '';
+          boxes[j].style.height = '';
+        }
+        try {
+          if (charts.cognitive) charts.cognitive.resize();
+          if (charts.ot) charts.ot.resize();
+          if (charts.gerontech) charts.gerontech.resize();
+        } catch (e2) {}
+        window.removeEventListener('afterprint', restore);
+      }
+      window.addEventListener('afterprint', restore);
+      // Fallback if afterprint not fired
+      setTimeout(restore, 3000);
+      setTimeout(function () { window.print(); }, 150);
+    }
 
 
     function exportCSV() {
