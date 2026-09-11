@@ -969,6 +969,15 @@
       "startTime": "11:15",
       "endTime": "12:15",
       "note": ""
+    },
+    {
+      "id": "mtwiksk6ars09d",
+      "deviceId": "mtmc22g1ntvasp",
+      "caseId": "mth0hjw5rx65w9",
+      "weekday": "4",
+      "startTime": "14:30",
+      "endTime": "15:30",
+      "note": ""
     }
   ]
 }
