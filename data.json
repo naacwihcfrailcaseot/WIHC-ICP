@@ -892,9 +892,10 @@
       "cognitive": "Major NCD",
       "otTraining": "Yes",
       "gerontech": "No",
-      "status": "active",
+      "status": "discharged",
+      "dischargedAt": "2026-09-22",
       "createdAt": "2026-09-22T09:03:13.669Z",
-      "updatedAt": "2026-09-22T09:03:13.669Z"
+      "updatedAt": "2026-09-22T09:12:43.643Z"
     },
     {
       "id": "mucg7rdc9anq8r",
@@ -905,6 +906,7 @@
       "otTraining": "Yes",
       "gerontech": "No",
       "status": "active",
+      "dischargedAt": null,
       "createdAt": "2026-09-22T09:05:10.224Z",
       "updatedAt": "2026-09-22T09:05:10.224Z"
     }
