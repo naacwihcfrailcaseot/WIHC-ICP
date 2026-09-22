@@ -576,6 +576,10 @@
                 <option value="No">No</option>
               </select>
             </div>
+            <div class="form-group date" id="dischargeMonthGroup" style="display:none;">
+              <label for="dischargeMonth">退會年月</label>
+              <input type="month" id="dischargeMonth" />
+            </div>
             <div class="form-actions">
               <button type="submit" class="btn-primary" id="btnSubmit">儲存</button>
               <button type="button" class="btn-secondary" onclick="resetForm()">清空</button>
@@ -598,7 +602,7 @@
       <div class="card-body">
         <div class="filters no-print">
           <div class="filter-btns" id="filterStatusBtns">
-            <button type="button" class="filter-btn is-on" data-filter="all">全部</button>
+            <button type="button" class="filter-btn is-on" data-filter="all" title="只顯示在籍個案">全部（在籍）</button>
             <button type="button" class="filter-btn" data-filter="due">須覆核/過期</button>
             <button type="button" class="filter-btn" data-filter="discharged">已退會</button>
           </div>
@@ -623,6 +627,7 @@
                 <th>ICP Date</th>
                 <th>下次覆核期限</th>
                 <th>覆核狀態</th>
+                <th>退會年月</th>
                 <th>認知</th>
                 <th>OT</th>
                 <th>Gerontech</th>
@@ -897,6 +902,9 @@
       return arr.map(function (c) {
         if (!c || typeof c !== 'object') return null;
         var status = c.status === 'discharged' ? 'discharged' : 'active';
+        var dMonth = c.dischargedMonth || '';
+        if (!dMonth && c.dischargedAt) dMonth = String(c.dischargedAt).slice(0, 7);
+        if (status !== 'discharged') dMonth = '';
         return {
           id: c.id || uid(),
           name: String(c.name || '').trim(),
@@ -907,6 +915,7 @@
           gerontech: c.gerontech === 'Yes' ? 'Yes' : 'No',
           status: status,
           dischargedAt: c.dischargedAt || null,
+          dischargedMonth: dMonth || null,
           createdAt: c.createdAt || new Date().toISOString(),
           updatedAt: c.updatedAt || new Date().toISOString()
         };
@@ -1121,7 +1130,15 @@
       if (!d) return s;
       return d.toLocaleDateString('zh-HK', { year: 'numeric', month: '2-digit', day: '2-digit' });
     }
-    function addYears(dateStr, years) {
+        function formatDischargeMonth(ym) {
+      if (!ym) return '—';
+      var s = String(ym).slice(0, 7);
+      var parts = s.split('-');
+      if (parts.length < 2) return s;
+      return parts[0] + '年' + parseInt(parts[1], 10) + '月';
+    }
+
+function addYears(dateStr, years) {
       var d = parseDate(dateStr);
       if (!d) return '';
       d.setFullYear(d.getFullYear() + years);
@@ -1179,6 +1196,10 @@
       document.getElementById('formTitle').textContent = '新增個案';
       document.getElementById('btnSubmit').textContent = '儲存';
       document.getElementById('btnCancelEdit').style.display = 'none';
+      var discGroup = document.getElementById('dischargeMonthGroup');
+      var discInput = document.getElementById('dischargeMonth');
+      if (discGroup) discGroup.style.display = 'none';
+      if (discInput) discInput.value = '';
     }
     function cancelEdit() { resetForm(); }
 
@@ -1204,10 +1225,18 @@
       if (editId) {
         var idx = cases.findIndex(function (c) { return c.id === editId; });
         if (idx === -1) return;
+        var isDisc = cases[idx].status === 'discharged';
+        var dMonth = document.getElementById('dischargeMonth').value || '';
+        if (isDisc && !dMonth) {
+          toast('退會個案請填寫退會年月');
+          return;
+        }
         cases[idx] = Object.assign({}, cases[idx], {
           name: name, admissionDate: admissionDate, icpDate: icpDate,
           cognitive: cognitive, otTraining: otTraining, gerontech: gerontech,
-          status: cases[idx].status === 'discharged' ? 'discharged' : 'active',
+          status: isDisc ? 'discharged' : 'active',
+          dischargedMonth: isDisc ? dMonth : null,
+          dischargedAt: isDisc ? (dMonth + '-01') : null,
           updatedAt: new Date().toISOString()
         });
         await persist('更新個案: ' + name);
@@ -1241,6 +1270,15 @@
       document.getElementById('cognitive').value = c.cognitive;
       document.getElementById('otTraining').value = c.otTraining;
       document.getElementById('gerontech').value = c.gerontech;
+      var discGroup = document.getElementById('dischargeMonthGroup');
+      var discInput = document.getElementById('dischargeMonth');
+      if (c.status === 'discharged') {
+        discGroup.style.display = '';
+        discInput.value = c.dischargedMonth || (c.dischargedAt ? String(c.dischargedAt).slice(0, 7) : '');
+      } else {
+        discGroup.style.display = 'none';
+        discInput.value = '';
+      }
       document.getElementById('formTitle').textContent = '編輯個案';
       document.getElementById('btnSubmit').textContent = '更新';
       document.getElementById('btnCancelEdit').style.display = 'inline-block';
@@ -1277,13 +1315,16 @@
         toast('此個案已是退會狀態');
         return;
       }
-      openModal('確認退會', '確定將「' + c.name + '」標記為已退會？退會後不計入在籍服務量。', async function () {
+      var now = new Date();
+      var defaultYM = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      openModal('確認退會', '確定將「' + c.name + '」標記為已退會？\n退會年月先設為 ' + formatDischargeMonth(defaultYM) + '（可於編輯修改）。\n退會後不會出現在「全部（在籍）」列表。', async function () {
         c.status = 'discharged';
-        c.dischargedAt = new Date().toISOString().slice(0, 10);
+        c.dischargedMonth = defaultYM;
+        c.dischargedAt = defaultYM + '-01';
         c.updatedAt = new Date().toISOString();
         await persist('退會: ' + c.name);
         refreshAll();
-        toast('「' + c.name + '」已退會');
+        toast('「' + c.name + '」已退會（' + formatDischargeMonth(defaultYM) + '）');
       });
     }
 
@@ -1298,6 +1339,7 @@
       openModal('重新入會', '確定將「' + c.name + '」重新標記為在籍？', async function () {
         c.status = 'active';
         c.dischargedAt = null;
+        c.dischargedMonth = null;
         c.updatedAt = new Date().toISOString();
         await persist('重新入會: ' + c.name);
         refreshAll();
@@ -1469,10 +1511,10 @@
           list = list.filter(function (c) {
             return isActive(c) && (getReviewStatus(c) === 'due' || getReviewStatus(c) === 'overdue');
           });
-        } else if (statusFilter === 'active') {
+        } else {
+          // 「全部（在籍）」：不含已退會
           list = list.filter(isActive);
         }
-        // statusFilter === 'all' → no status filter
 
         if (cogFilter) {
           list = list.filter(function (c) { return c && c.cognitive === cogFilter; });
@@ -1484,8 +1526,14 @@
         }
 
         if (statusFilter === 'due') {
-          // Most urgent (nearest review deadline) at top
           list = sortByReviewDueAsc(list);
+        } else if (statusFilter === 'discharged') {
+          list.sort(function (a, b) {
+            var ma = (a && (a.dischargedMonth || (a.dischargedAt || '').slice(0, 7))) || '';
+            var mb = (b && (b.dischargedMonth || (b.dischargedAt || '').slice(0, 7))) || '';
+            if (ma !== mb) return ma < mb ? 1 : -1;
+            return ((a && a.name) || '').localeCompare((b && b.name) || '', 'zh-HK');
+          });
         } else {
           list.sort(function (a, b) {
             var da = (a && a.admissionDate) || '';
@@ -1520,12 +1568,14 @@
           var cid = c.id || ('tmp' + i);
           var status = getReviewStatus(c);
           var due = nextReviewDue(c.icpDate);
+          var dMonthShow = c.dischargedMonth || (c.dischargedAt ? String(c.dischargedAt).slice(0, 7) : '');
           html += '<tr data-id="' + escapeHtml(cid) + '">' +
             '<td><strong>' + escapeHtml(c.name || '') + '</strong></td>' +
             '<td>' + formatDate(c.admissionDate) + '</td>' +
             '<td>' + formatDate(c.icpDate) + '</td>' +
             '<td>' + (isActive(c) ? formatDate(due) : '—') + '</td>' +
             '<td>' + statusLabel(status) + '</td>' +
+            '<td>' + (isActive(c) ? '—' : formatDischargeMonth(dMonthShow)) + '</td>' +
             '<td>' + cogBadge(c.cognitive) + '</td>' +
             '<td>' + ynBadge(c.otTraining) + '</td>' +
             '<td>' + ynBadge(c.gerontech) + '</td>' +
@@ -2136,10 +2186,10 @@
 
 
     function exportCSV() {
-      var headers = ['姓名', '入會日期', 'ICP Date', '認知水平', 'OT Training', '使用Gerontech', '狀態', '離院日期'];
+      var headers = ['姓名', '入會日期', 'ICP Date', '認知水平', 'OT Training', '使用Gerontech', '狀態', '退會年月'];
       var rows = cases.map(function (c) {
         return [c.name, c.admissionDate, c.icpDate, c.cognitive, c.otTraining, c.gerontech,
-          isActive(c) ? '在籍' : '已退會', c.dischargedAt || ''];
+          isActive(c) ? '在籍' : '已退會', (c.dischargedMonth || (c.dischargedAt ? String(c.dischargedAt).slice(0, 7) : '')) || ''];
       });
       var csv = [headers].concat(rows).map(function (r) {
         return r.map(function (cell) { return '"' + String(cell).replace(/"/g, '""') + '"'; }).join(',');
@@ -2192,7 +2242,8 @@
               otTraining: cols[4].trim() === 'Yes' ? 'Yes' : 'No',
               gerontech: cols[5].trim() === 'Yes' ? 'Yes' : 'No',
               status: isDischarged ? 'discharged' : 'active',
-              dischargedAt: cols[7] ? cols[7].trim() : null,
+              dischargedMonth: isDischarged && cols[7] ? cols[7].trim().slice(0, 7) : null,
+              dischargedAt: isDischarged && cols[7] ? (cols[7].trim().length === 7 ? cols[7].trim() + '-01' : cols[7].trim()) : null,
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString()
             });
