@@ -153,6 +153,8 @@
     .btn-success { background: var(--success); color: #fff; }
     .btn-success:hover:not(:disabled) { background: #1c4532; }
     .btn-danger { background: var(--danger); color: #fff; }
+    .btn-warning { background: var(--warning); color: #fff; }
+    .btn-warning:hover:not(:disabled) { background: #744210; }
     .btn-danger:hover:not(:disabled) { background: #742a2a; }
     .btn-sm { padding: 0.26rem 0.5rem; font-size: 0.75rem; }
     .btn-header {
@@ -598,7 +600,7 @@
           <div class="filter-btns" id="filterStatusBtns">
             <button type="button" class="filter-btn is-on" data-filter="all">全部</button>
             <button type="button" class="filter-btn" data-filter="due">須覆核/過期</button>
-            <button type="button" class="filter-btn" data-filter="discharged">已離院</button>
+            <button type="button" class="filter-btn" data-filter="discharged">已退會</button>
           </div>
           <select id="filterCognitive">
             <option value="" selected>全部認知水平</option>
@@ -1148,7 +1150,7 @@
     function statusLabel(s) {
       if (s === 'overdue') return '<span class="badge badge-overdue">已過期</span>';
       if (s === 'due') return '<span class="badge badge-due">須覆核</span>';
-      if (s === 'discharged') return '<span class="badge badge-discharged">已離院</span>';
+      if (s === 'discharged') return '<span class="badge badge-discharged">已退會</span>';
       return '<span class="badge badge-ok">正常</span>';
     }
     function cogBadge(level) {
@@ -1268,6 +1270,41 @@
       }, true);
     }
 
+    function askWithdraw(id) {
+      var c = cases.find(function (x) { return x.id === id; });
+      if (!c) return;
+      if (c.status === 'discharged') {
+        toast('此個案已是退會狀態');
+        return;
+      }
+      openModal('確認退會', '確定將「' + c.name + '」標記為已退會？退會後不計入在籍服務量。', async function () {
+        c.status = 'discharged';
+        c.dischargedAt = new Date().toISOString().slice(0, 10);
+        c.updatedAt = new Date().toISOString();
+        await persist('退會: ' + c.name);
+        refreshAll();
+        toast('「' + c.name + '」已退會');
+      });
+    }
+
+    function askReactivate(id) {
+      var c = cases.find(function (x) { return x.id === id; });
+      if (!c) return;
+      if (c.status !== 'discharged') return;
+      if (cases.filter(isActive).length >= MAX_CASELOAD) {
+        toast('已達最高服務量 70 人，無法重新入會');
+        return;
+      }
+      openModal('重新入會', '確定將「' + c.name + '」重新標記為在籍？', async function () {
+        c.status = 'active';
+        c.dischargedAt = null;
+        c.updatedAt = new Date().toISOString();
+        await persist('重新入會: ' + c.name);
+        refreshAll();
+        toast('「' + c.name + '」已重新入會');
+      });
+    }
+
     function openModal(title, msg, onConfirm, isDanger) {
       document.getElementById('modalTitle').textContent = title;
       document.getElementById('modalMsg').textContent = msg;
@@ -1312,6 +1349,15 @@
       fill.className = 'caseload-fill' + (pct >= 100 ? ' full' : pct >= 85 ? ' near' : '');
     }
 
+    function sortByReviewDueAsc(list) {
+      return list.slice().sort(function (a, b) {
+        var da = nextReviewDue(a.icpDate) || '';
+        var db = nextReviewDue(b.icpDate) || '';
+        if (da !== db) return da < db ? -1 : 1;
+        return (a.name || '').localeCompare(b.name || '', 'zh-HK');
+      });
+    }
+
     function renderAlerts() {
       var active = cases.filter(isActive);
       var dueList = [], overdueList = [];
@@ -1320,6 +1366,9 @@
         if (s === 'due') dueList.push(c);
         if (s === 'overdue') overdueList.push(c);
       });
+      // Nearest deadline first (most urgent at top)
+      overdueList = sortByReviewDueAsc(overdueList);
+      dueList = sortByReviewDueAsc(dueList);
       var box = document.getElementById('alertBox');
       if (!dueList.length && !overdueList.length) { box.style.display = 'none'; return; }
       var html = '';
@@ -1434,12 +1483,17 @@
           });
         }
 
-        list.sort(function (a, b) {
-          var da = (a && a.admissionDate) || '';
-          var db = (b && b.admissionDate) || '';
-          if (da !== db) return da < db ? -1 : 1;
-          return ((a && a.name) || '').localeCompare((b && b.name) || '', 'zh-HK');
-        });
+        if (statusFilter === 'due') {
+          // Most urgent (nearest review deadline) at top
+          list = sortByReviewDueAsc(list);
+        } else {
+          list.sort(function (a, b) {
+            var da = (a && a.admissionDate) || '';
+            var db = (b && b.admissionDate) || '';
+            if (da !== db) return da < db ? -1 : 1;
+            return ((a && a.name) || '').localeCompare((b && b.name) || '', 'zh-HK');
+          });
+        }
 
         var tbody = document.getElementById('caseTableBody');
         var empty = document.getElementById('emptyMsg');
@@ -1476,9 +1530,15 @@
             '<td>' + ynBadge(c.otTraining) + '</td>' +
             '<td>' + ynBadge(c.gerontech) + '</td>' +
             '<td class="no-print" style="white-space:nowrap;">' +
-              '<button type="button" class="btn-success btn-sm" data-act="review" data-id="' + escapeHtml(cid) + '">覆核</button> ' +
-              '<button type="button" class="btn-secondary btn-sm" data-act="edit" data-id="' + escapeHtml(cid) + '">編輯</button> ' +
-              '<button type="button" class="btn-danger btn-sm" data-act="delete" data-id="' + escapeHtml(cid) + '">刪除</button>' +
+              (isActive(c)
+                ? '<button type="button" class="btn-success btn-sm" data-act="review" data-id="' + escapeHtml(cid) + '">覆核</button> ' +
+                  '<button type="button" class="btn-secondary btn-sm" data-act="edit" data-id="' + escapeHtml(cid) + '">編輯</button> ' +
+                  '<button type="button" class="btn-warning btn-sm" data-act="withdraw" data-id="' + escapeHtml(cid) + '">退會</button> ' +
+                  '<button type="button" class="btn-danger btn-sm" data-act="delete" data-id="' + escapeHtml(cid) + '">刪除</button>'
+                : '<button type="button" class="btn-primary btn-sm" data-act="reactivate" data-id="' + escapeHtml(cid) + '">重新入會</button> ' +
+                  '<button type="button" class="btn-secondary btn-sm" data-act="edit" data-id="' + escapeHtml(cid) + '">編輯</button> ' +
+                  '<button type="button" class="btn-danger btn-sm" data-act="delete" data-id="' + escapeHtml(cid) + '">刪除</button>'
+              ) +
             '</td></tr>';
         }
         tbody.innerHTML = html;
@@ -1499,6 +1559,8 @@
       if (act === 'review') askReview(id);
       else if (act === 'edit') editCase(id);
       else if (act === 'delete') askDelete(id);
+      else if (act === 'withdraw') askWithdraw(id);
+      else if (act === 'reactivate') askReactivate(id);
     });
 
     function makePieOptions(total) {
@@ -2077,7 +2139,7 @@
       var headers = ['姓名', '入會日期', 'ICP Date', '認知水平', 'OT Training', '使用Gerontech', '狀態', '離院日期'];
       var rows = cases.map(function (c) {
         return [c.name, c.admissionDate, c.icpDate, c.cognitive, c.otTraining, c.gerontech,
-          isActive(c) ? '在籍' : '已離院', c.dischargedAt || ''];
+          isActive(c) ? '在籍' : '已退會', c.dischargedAt || ''];
       });
       var csv = [headers].concat(rows).map(function (r) {
         return r.map(function (cell) { return '"' + String(cell).replace(/"/g, '""') + '"'; }).join(',');
@@ -2120,7 +2182,7 @@
             var name = cols[0].trim();
             if (!name) continue;
             var statusStr = (cols[6] || '').trim();
-            var isDischarged = statusStr === '已離院' || statusStr === 'discharged';
+            var isDischarged = statusStr === '已離院' || statusStr === '已退會' || statusStr === 'discharged';
             if (!isDischarged && cases.filter(isActive).length + added >= MAX_CASELOAD) break;
             cases.push({
               id: uid(), name: name,
