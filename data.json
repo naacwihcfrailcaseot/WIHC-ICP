@@ -10,6 +10,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:01:19.299Z",
       "updatedAt": "2026-09-11T03:38:46.320Z"
     },
@@ -23,6 +24,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:08:41.226Z",
       "updatedAt": "2026-08-31T08:08:41.226Z"
     },
@@ -36,6 +38,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:12:04.303Z",
       "updatedAt": "2026-08-31T08:12:04.303Z"
     },
@@ -49,6 +52,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:12:57.003Z",
       "updatedAt": "2026-08-31T08:12:57.003Z"
     },
@@ -62,6 +66,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:14:49.137Z",
       "updatedAt": "2026-08-31T08:14:49.137Z"
     },
@@ -75,6 +80,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:15:44.864Z",
       "updatedAt": "2026-08-31T08:15:44.864Z"
     },
@@ -88,6 +94,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:17:31.406Z",
       "updatedAt": "2026-08-31T08:17:31.406Z"
     },
@@ -101,6 +108,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:18:30.462Z",
       "updatedAt": "2026-08-31T08:18:30.462Z"
     },
@@ -114,6 +122,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:19:19.164Z",
       "updatedAt": "2026-09-15T05:52:00.305Z"
     },
@@ -127,6 +136,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:20:01.254Z",
       "updatedAt": "2026-09-21T07:00:33.009Z"
     },
@@ -140,6 +150,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:20:45.676Z",
       "updatedAt": "2026-08-31T08:20:45.676Z"
     },
@@ -153,6 +164,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:21:40.839Z",
       "updatedAt": "2026-08-31T08:21:40.839Z"
     },
@@ -166,6 +178,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:22:36.348Z",
       "updatedAt": "2026-08-31T08:22:36.348Z"
     },
@@ -179,6 +192,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:23:45.853Z",
       "updatedAt": "2026-08-31T08:23:45.853Z"
     },
@@ -192,6 +206,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:24:44.093Z",
       "updatedAt": "2026-08-31T08:24:44.093Z"
     },
@@ -205,6 +220,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:25:34.878Z",
       "updatedAt": "2026-08-31T08:25:34.878Z"
     },
@@ -218,6 +234,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:26:18.466Z",
       "updatedAt": "2026-08-31T08:26:18.466Z"
     },
@@ -231,6 +248,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:27:35.823Z",
       "updatedAt": "2026-08-31T08:27:35.823Z"
     },
@@ -244,6 +262,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:28:23.602Z",
       "updatedAt": "2026-09-21T03:33:48.471Z"
     },
@@ -257,6 +276,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:29:01.862Z",
       "updatedAt": "2026-08-31T08:29:01.862Z"
     },
@@ -270,6 +290,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:29:59.430Z",
       "updatedAt": "2026-08-31T08:29:59.430Z"
     },
@@ -283,6 +304,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:30:58.276Z",
       "updatedAt": "2026-08-31T08:30:58.276Z"
     },
@@ -296,6 +318,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:31:51.536Z",
       "updatedAt": "2026-08-31T08:31:51.536Z"
     },
@@ -309,6 +332,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:32:33.347Z",
       "updatedAt": "2026-08-31T08:32:33.347Z"
     },
@@ -322,6 +346,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:33:50.552Z",
       "updatedAt": "2026-08-31T08:33:50.552Z"
     },
@@ -335,6 +360,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:35:03.427Z",
       "updatedAt": "2026-08-31T08:35:03.427Z"
     },
@@ -348,6 +374,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:35:38.053Z",
       "updatedAt": "2026-08-31T08:35:38.053Z"
     },
@@ -361,6 +388,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:36:36.628Z",
       "updatedAt": "2026-08-31T08:36:36.628Z"
     },
@@ -374,6 +402,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:37:37.448Z",
       "updatedAt": "2026-08-31T08:37:37.448Z"
     },
@@ -387,6 +416,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:38:22.382Z",
       "updatedAt": "2026-08-31T08:38:22.382Z"
     },
@@ -400,6 +430,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:38:56.594Z",
       "updatedAt": "2026-08-31T08:38:56.594Z"
     },
@@ -413,6 +444,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:39:35.523Z",
       "updatedAt": "2026-08-31T08:39:35.523Z"
     },
@@ -426,6 +458,7 @@
       "gerontech": "Yes",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:40:12.401Z",
       "updatedAt": "2026-08-31T08:40:12.401Z"
     },
@@ -439,6 +472,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:41:04.985Z",
       "updatedAt": "2026-08-31T08:41:04.985Z"
     },
@@ -452,6 +486,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:41:47.682Z",
       "updatedAt": "2026-08-31T08:41:47.682Z"
     },
@@ -465,6 +500,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:42:34.149Z",
       "updatedAt": "2026-08-31T08:42:34.149Z"
     },
@@ -478,6 +514,7 @@
       "gerontech": "Yes",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:43:15.069Z",
       "updatedAt": "2026-08-31T08:43:15.069Z"
     },
@@ -491,6 +528,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:43:58.019Z",
       "updatedAt": "2026-08-31T08:43:58.019Z"
     },
@@ -504,6 +542,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:44:27.628Z",
       "updatedAt": "2026-08-31T08:44:27.628Z"
     },
@@ -517,6 +556,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:45:08.697Z",
       "updatedAt": "2026-08-31T08:45:08.697Z"
     },
@@ -530,6 +570,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:45:48.646Z",
       "updatedAt": "2026-08-31T08:45:48.646Z"
     },
@@ -543,6 +584,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:46:30.774Z",
       "updatedAt": "2026-08-31T08:46:30.774Z"
     },
@@ -556,6 +598,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:47:11.189Z",
       "updatedAt": "2026-08-31T08:47:11.189Z"
     },
@@ -569,6 +612,7 @@
       "gerontech": "Yes",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:47:58.797Z",
       "updatedAt": "2026-08-31T08:47:58.797Z"
     },
@@ -582,6 +626,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:48:35.539Z",
       "updatedAt": "2026-08-31T08:48:35.539Z"
     },
@@ -595,6 +640,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:49:16.321Z",
       "updatedAt": "2026-08-31T08:49:16.321Z"
     },
@@ -608,6 +654,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:50:16.962Z",
       "updatedAt": "2026-08-31T08:50:16.962Z"
     },
@@ -621,6 +668,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:51:36.186Z",
       "updatedAt": "2026-09-11T09:55:19.474Z"
     },
@@ -634,6 +682,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:52:36.131Z",
       "updatedAt": "2026-08-31T08:52:36.131Z"
     },
@@ -647,6 +696,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:53:20.501Z",
       "updatedAt": "2026-08-31T08:53:20.501Z"
     },
@@ -660,6 +710,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:53:49.272Z",
       "updatedAt": "2026-08-31T08:53:49.272Z"
     },
@@ -673,6 +724,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:54:26.098Z",
       "updatedAt": "2026-08-31T08:54:26.098Z"
     },
@@ -686,6 +738,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:55:06.899Z",
       "updatedAt": "2026-08-31T08:55:06.899Z"
     },
@@ -699,6 +752,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:55:39.446Z",
       "updatedAt": "2026-08-31T08:55:39.446Z"
     },
@@ -712,6 +766,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:56:02.561Z",
       "updatedAt": "2026-08-31T08:56:02.561Z"
     },
@@ -725,6 +780,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:56:32.399Z",
       "updatedAt": "2026-08-31T08:56:32.399Z"
     },
@@ -738,6 +794,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:57:27.411Z",
       "updatedAt": "2026-08-31T08:57:27.411Z"
     },
@@ -751,6 +808,7 @@
       "gerontech": "Yes",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:57:57.363Z",
       "updatedAt": "2026-08-31T08:58:16.135Z"
     },
@@ -764,6 +822,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T08:59:16.044Z",
       "updatedAt": "2026-08-31T08:59:16.044Z"
     },
@@ -777,6 +836,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T09:00:33.483Z",
       "updatedAt": "2026-08-31T09:00:33.483Z"
     },
@@ -790,6 +850,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T09:01:03.381Z",
       "updatedAt": "2026-08-31T09:01:03.381Z"
     },
@@ -803,6 +864,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T09:01:42.937Z",
       "updatedAt": "2026-08-31T09:01:42.937Z"
     },
@@ -816,6 +878,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T09:02:08.173Z",
       "updatedAt": "2026-08-31T09:02:08.173Z"
     },
@@ -829,6 +892,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T09:02:35.793Z",
       "updatedAt": "2026-08-31T09:02:35.793Z"
     },
@@ -842,6 +906,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T09:03:02.527Z",
       "updatedAt": "2026-08-31T09:03:02.527Z"
     },
@@ -855,6 +920,7 @@
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T09:03:32.699Z",
       "updatedAt": "2026-08-31T09:03:32.699Z"
     },
@@ -868,6 +934,7 @@
       "gerontech": "Yes",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T09:04:01.781Z",
       "updatedAt": "2026-08-31T09:04:01.781Z"
     },
@@ -881,6 +948,7 @@
       "gerontech": "Yes",
       "status": "active",
       "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-08-31T09:04:39.406Z",
       "updatedAt": "2026-08-31T09:04:39.406Z"
     },
@@ -894,6 +962,7 @@
       "gerontech": "No",
       "status": "discharged",
       "dischargedAt": "2026-09-22",
+      "dischargedMonth": "2026-09",
       "createdAt": "2026-09-22T09:03:13.669Z",
       "updatedAt": "2026-09-22T09:12:43.643Z"
     },
@@ -905,10 +974,11 @@
       "cognitive": "Major NCD",
       "otTraining": "Yes",
       "gerontech": "No",
-      "status": "active",
-      "dischargedAt": null,
+      "status": "discharged",
+      "dischargedAt": "2026-09-01",
+      "dischargedMonth": "2026-09",
       "createdAt": "2026-09-22T09:05:10.224Z",
-      "updatedAt": "2026-09-22T09:05:10.224Z"
+      "updatedAt": "2026-09-22T09:20:13.898Z"
     }
   ],
   "devices": [
