@@ -974,11 +974,11 @@
       "cognitive": "Major NCD",
       "otTraining": "Yes",
       "gerontech": "No",
-      "status": "discharged",
-      "dischargedAt": "2026-09-01",
-      "dischargedMonth": "2026-09",
+      "status": "active",
+      "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-09-22T09:05:10.224Z",
-      "updatedAt": "2026-09-22T09:20:13.898Z"
+      "updatedAt": "2026-09-28T03:49:36.518Z"
     }
   ],
   "devices": [
