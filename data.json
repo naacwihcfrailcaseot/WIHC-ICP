@@ -989,8 +989,22 @@
       "otTraining": "No",
       "gerontech": "No",
       "status": "active",
+      "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-10-08T05:40:01.694Z",
       "updatedAt": "2026-10-08T05:40:01.694Z"
+    },
+    {
+      "id": "muzay16096uxg8",
+      "name": "Y少霞",
+      "admissionDate": "2026-10-08",
+      "icpDate": "2026-10-08",
+      "cognitive": "MCI",
+      "otTraining": "Yes",
+      "gerontech": "Yes",
+      "status": "active",
+      "createdAt": "2026-10-08T08:56:20.328Z",
+      "updatedAt": "2026-10-08T08:56:20.328Z"
     }
   ],
   "devices": [
