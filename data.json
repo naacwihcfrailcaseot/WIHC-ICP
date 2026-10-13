@@ -946,11 +946,11 @@
       "cognitive": "Dementia",
       "otTraining": "Yes",
       "gerontech": "Yes",
-      "status": "active",
-      "dischargedAt": null,
-      "dischargedMonth": null,
+      "status": "discharged",
+      "dischargedAt": "2026-10-01",
+      "dischargedMonth": "2026-10",
       "createdAt": "2026-08-31T09:04:39.406Z",
-      "updatedAt": "2026-08-31T09:04:39.406Z"
+      "updatedAt": "2026-10-13T06:22:52.141Z"
     },
     {
       "id": "mucg59fpvtq3eb",
@@ -1003,6 +1003,8 @@
       "otTraining": "Yes",
       "gerontech": "Yes",
       "status": "active",
+      "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-10-08T08:56:20.328Z",
       "updatedAt": "2026-10-08T08:56:20.328Z"
     }
