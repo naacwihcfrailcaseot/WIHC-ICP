@@ -74,7 +74,7 @@
       "id": "mtgyrgm8d08f5i",
       "name": "C生仕",
       "admissionDate": "2020-10-19",
-      "icpDate": "2025-10-13",
+      "icpDate": "2026-10-30",
       "cognitive": "Normal",
       "otTraining": "No",
       "gerontech": "No",
@@ -82,7 +82,7 @@
       "dischargedAt": null,
       "dischargedMonth": null,
       "createdAt": "2026-08-31T08:15:44.864Z",
-      "updatedAt": "2026-08-31T08:15:44.864Z"
+      "updatedAt": "2026-10-31T08:45:25.705Z"
     },
     {
       "id": "mtgytqtqygdr29",
@@ -1017,6 +1017,8 @@
       "otTraining": "No",
       "gerontech": "No",
       "status": "active",
+      "dischargedAt": null,
+      "dischargedMonth": null,
       "createdAt": "2026-10-30T06:28:16.458Z",
       "updatedAt": "2026-10-30T06:28:16.458Z"
     }
