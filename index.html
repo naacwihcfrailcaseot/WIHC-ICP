@@ -860,15 +860,11 @@
       <p id="reviewModalHint" style="font-size:0.82rem;color:var(--muted);margin-bottom:0.6rem;"></p>
       <form class="review-form" id="reviewForm" autocomplete="off" onsubmit="return false;">
         <input type="hidden" id="reviewCaseId" />
-        <div class="row2">
-          <div class="form-group">
-            <label for="reviewDate">評估／覆核日期 *</label>
-            <input type="date" id="reviewDate" required />
-          </div>
-          <div class="form-group">
-            <label for="reviewIcpDate">新 ICP Date *</label>
-            <input type="date" id="reviewIcpDate" required />
-          </div>
+        <input type="hidden" id="reviewAssessId" />
+        <div class="form-group">
+          <label for="reviewDate">完成 ICP 評估日期 *</label>
+          <input type="date" id="reviewDate" required />
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;">此日期會同時寫入評估紀錄，並更新為最新 ICP Date（編輯舊紀錄時不會改動現時 ICP Date）。</div>
         </div>
         <div class="row2">
           <div class="form-group">
@@ -879,29 +875,33 @@
               <option value="HKBC">HKBC</option>
               <option value="AMT">AMT</option>
               <option value="CDR">CDR</option>
-              <option value="other">other</option>
+              <option value="other">other（自訂名稱）</option>
             </select>
           </div>
-          <div class="form-group">
-            <label for="reviewCogScore">認知分數 *</label>
-            <input type="number" id="reviewCogScore" step="any" required placeholder="例如：22" />
+          <div class="form-group" id="reviewOtherToolGroup" style="display:none;">
+            <label for="reviewOtherTool">自訂工具名稱 *</label>
+            <input type="text" id="reviewOtherTool" placeholder="輸入工具名稱" />
           </div>
         </div>
         <div class="row2">
           <div class="form-group">
+            <label for="reviewCogScore">認知分數 *</label>
+            <input type="number" id="reviewCogScore" step="any" required placeholder="例如：22" />
+          </div>
+          <div class="form-group">
             <label for="reviewMbi">MBI（ADL）分數 *</label>
             <input type="number" id="reviewMbi" step="any" min="0" max="100" required placeholder="0–100" />
           </div>
-          <div class="form-group">
-            <label for="reviewNotes">備註</label>
-            <input type="text" id="reviewNotes" placeholder="選填" />
-          </div>
         </div>
-        <p style="font-size:0.75rem;color:var(--muted);margin:0.2rem 0 0.5rem;">舊 ICP Date 及過往分數會保留在評估紀錄中，不會因更新而消失。</p>
+        <div class="form-group">
+          <label for="reviewNotes">備註</label>
+          <input type="text" id="reviewNotes" placeholder="選填" />
+        </div>
+        <p style="font-size:0.75rem;color:var(--muted);margin:0.2rem 0 0.5rem;">過往 ICP Date 與分數會保留在歷史紀錄中，可於個案列展開後編輯或刪除。</p>
       </form>
       <div class="btn-row">
         <button type="button" class="btn-secondary" onclick="closeReviewModal()">取消</button>
-        <button type="button" class="btn-primary" id="btnSaveReview">儲存覆核紀錄</button>
+        <button type="button" class="btn-primary" id="btnSaveReview">儲存</button>
       </div>
     </div>
   </div>
@@ -1045,8 +1045,9 @@
       if (!Array.isArray(arr)) return [];
       return arr.map(function (a) {
         if (!a || typeof a !== 'object') return null;
-        var tool = String(a.cognitiveTool || a.tool || 'other').trim();
-        if (COG_TOOLS.indexOf(tool) === -1) tool = 'other';
+        var tool = String(a.cognitiveTool || a.tool || '').trim();
+        if (!tool) tool = 'other';
+        // keep custom tool names (do not force unknown tools back to "other")
         var score = a.cognitiveScore;
         if (score === undefined || score === null || score === '') return null;
         var mbi = a.mbiScore;
@@ -1067,6 +1068,18 @@
           return 0;
         });
     }
+
+    function isPresetCogTool(tool) {
+      return COG_TOOLS.indexOf(tool) !== -1;
+    }
+
+    function syncOtherToolField() {
+      var sel = document.getElementById('reviewCogTool');
+      var group = document.getElementById('reviewOtherToolGroup');
+      if (!sel || !group) return;
+      group.style.display = (sel.value === 'other') ? '' : 'none';
+    }
+
 
 
     function applyDocument(doc) {
@@ -1432,19 +1445,49 @@ function addYears(dateStr, years) {
     }
 
     function askReview(id) {
-      var c = cases.find(function (x) { return x.id === id; });
+      openAssessmentModal(id, null);
+    }
+
+    /** openAssessmentModal(caseId, assessId|null) — null = new ICP review */
+    function openAssessmentModal(caseId, assessId) {
+      var c = cases.find(function (x) { return x.id === caseId; });
       if (!c) return;
       var today = new Date().toISOString().slice(0, 10);
       document.getElementById('reviewCaseId').value = c.id;
-      document.getElementById('reviewModalTitle').textContent = 'ICP 覆核及評估 — ' + c.name;
-      document.getElementById('reviewModalHint').textContent =
-        '目前 ICP Date：' + formatDate(c.icpDate) + '。儲存後會新增一筆評估紀錄，並更新 ICP Date（舊紀錄保留）。';
-      document.getElementById('reviewDate').value = today;
-      document.getElementById('reviewIcpDate').value = today;
-      document.getElementById('reviewCogTool').value = 'HKMoCA-5min';
-      document.getElementById('reviewCogScore').value = '';
-      document.getElementById('reviewMbi').value = '';
-      document.getElementById('reviewNotes').value = '';
+      document.getElementById('reviewAssessId').value = assessId || '';
+
+      if (assessId) {
+        var a = (c.assessmentHistory || []).find(function (x) { return x.id === assessId; });
+        if (!a) { toast('找不到該評估紀錄'); return; }
+        document.getElementById('reviewModalTitle').textContent = '編輯評估紀錄 — ' + c.name;
+        document.getElementById('reviewModalHint').textContent =
+          '修改此筆歷史紀錄。不會自動改動個案現時 ICP Date（目前：' + formatDate(c.icpDate) + '）。';
+        document.getElementById('reviewDate').value = a.date || today;
+        document.getElementById('reviewCogScore').value = a.cognitiveScore;
+        document.getElementById('reviewMbi').value = a.mbiScore;
+        document.getElementById('reviewNotes').value = a.notes || '';
+        if (isPresetCogTool(a.cognitiveTool) && a.cognitiveTool !== 'other') {
+          document.getElementById('reviewCogTool').value = a.cognitiveTool;
+          document.getElementById('reviewOtherTool').value = '';
+        } else {
+          document.getElementById('reviewCogTool').value = 'other';
+          document.getElementById('reviewOtherTool').value =
+            (a.cognitiveTool === 'other') ? '' : (a.cognitiveTool || '');
+        }
+        document.getElementById('btnSaveReview').textContent = '更新紀錄';
+      } else {
+        document.getElementById('reviewModalTitle').textContent = 'ICP 覆核及評估 — ' + c.name;
+        document.getElementById('reviewModalHint').textContent =
+          '目前 ICP Date：' + formatDate(c.icpDate) + '。輸入完成評估的日期與分數即可；系統會新增紀錄並更新 ICP Date。';
+        document.getElementById('reviewDate').value = today;
+        document.getElementById('reviewCogTool').value = 'HKMoCA-5min';
+        document.getElementById('reviewOtherTool').value = '';
+        document.getElementById('reviewCogScore').value = '';
+        document.getElementById('reviewMbi').value = '';
+        document.getElementById('reviewNotes').value = '';
+        document.getElementById('btnSaveReview').textContent = '儲存覆核紀錄';
+      }
+      syncOtherToolField();
       document.getElementById('reviewModal').classList.add('show');
     }
 
@@ -1452,34 +1495,74 @@ function addYears(dateStr, years) {
       document.getElementById('reviewModal').classList.remove('show');
     }
 
+    function resolveReviewToolName() {
+      var tool = document.getElementById('reviewCogTool').value;
+      if (tool === 'other') {
+        var custom = document.getElementById('reviewOtherTool').value.trim();
+        if (!custom) return null;
+        return custom;
+      }
+      return tool;
+    }
+
     async function saveReviewRecord() {
       var id = document.getElementById('reviewCaseId').value;
+      var assessId = document.getElementById('reviewAssessId').value;
       var c = cases.find(function (x) { return x.id === id; });
       if (!c) return;
       var date = document.getElementById('reviewDate').value;
-      var newIcp = document.getElementById('reviewIcpDate').value;
-      var tool = document.getElementById('reviewCogTool').value;
+      var toolName = resolveReviewToolName();
       var cogScore = document.getElementById('reviewCogScore').value;
       var mbi = document.getElementById('reviewMbi').value;
       var notes = document.getElementById('reviewNotes').value.trim();
-      if (!date || !newIcp || cogScore === '' || mbi === '') {
-        toast('請填寫日期、認知分數及 MBI');
+      if (!date || cogScore === '' || mbi === '') {
+        toast('請填寫評估日期、認知分數及 MBI');
+        return;
+      }
+      if (!toolName) {
+        toast('請輸入自訂認知評估工具名稱');
         return;
       }
       if (!Array.isArray(c.assessmentHistory)) c.assessmentHistory = [];
+
+      if (assessId) {
+        var idx = c.assessmentHistory.findIndex(function (x) { return x.id === assessId; });
+        if (idx === -1) { toast('找不到該評估紀錄'); return; }
+        var old = c.assessmentHistory[idx];
+        c.assessmentHistory[idx] = {
+          id: old.id,
+          date: date,
+          previousIcpDate: old.previousIcpDate || null,
+          icpDate: date,
+          cognitiveTool: toolName,
+          cognitiveScore: Number(cogScore),
+          mbiScore: Number(mbi),
+          notes: notes
+        };
+        c.assessmentHistory = normalizeAssessments(c.assessmentHistory);
+        c.updatedAt = new Date().toISOString();
+        await persist('更新評估紀錄: ' + c.name);
+        closeReviewModal();
+        expandedCaseId = c.id;
+        refreshAll();
+        toast('評估紀錄已更新');
+        return;
+      }
+
+      // New ICP review: one date = assessment date + new ICP date
       var prevIcp = c.icpDate;
       c.assessmentHistory.push({
         id: uid(),
         date: date,
         previousIcpDate: prevIcp || null,
-        icpDate: newIcp,
-        cognitiveTool: tool,
+        icpDate: date,
+        cognitiveTool: toolName,
         cognitiveScore: Number(cogScore),
         mbiScore: Number(mbi),
         notes: notes
       });
       c.assessmentHistory = normalizeAssessments(c.assessmentHistory);
-      c.icpDate = newIcp;
+      c.icpDate = date;
       c.updatedAt = new Date().toISOString();
       await persist('覆核個案: ' + c.name);
       closeReviewModal();
@@ -1487,6 +1570,7 @@ function addYears(dateStr, years) {
       refreshAll();
       toast('已儲存「' + c.name + '」覆核及評估紀錄');
     }
+
 
 
     function askDelete(id) {
@@ -1822,10 +1906,12 @@ function addYears(dateStr, years) {
             '<td class="no-print" style="white-space:nowrap;">' +
               (isActive(c)
                 ? '<button type="button" class="btn-success btn-sm" data-act="review" data-id="' + escapeHtml(cid) + '">覆核</button> ' +
+                  '<button type="button" class="btn-primary btn-sm" data-act="detail" data-id="' + escapeHtml(cid) + '">評估詳情</button> ' +
                   '<button type="button" class="btn-secondary btn-sm" data-act="edit" data-id="' + escapeHtml(cid) + '">編輯</button> ' +
                   '<button type="button" class="btn-warning btn-sm" data-act="withdraw" data-id="' + escapeHtml(cid) + '">退會</button> ' +
                   '<button type="button" class="btn-danger btn-sm" data-act="delete" data-id="' + escapeHtml(cid) + '">刪除</button>'
-                : '<button type="button" class="btn-primary btn-sm" data-act="reactivate" data-id="' + escapeHtml(cid) + '">重新入會</button> ' +
+                : '<button type="button" class="btn-primary btn-sm" data-act="detail" data-id="' + escapeHtml(cid) + '">評估詳情</button> ' +
+                  '<button type="button" class="btn-primary btn-sm" data-act="reactivate" data-id="' + escapeHtml(cid) + '">重新入會</button> ' +
                   '<button type="button" class="btn-secondary btn-sm" data-act="edit" data-id="' + escapeHtml(cid) + '">編輯</button> ' +
                   '<button type="button" class="btn-danger btn-sm" data-act="delete" data-id="' + escapeHtml(cid) + '">刪除</button>'
               ) +
@@ -1855,11 +1941,17 @@ function addYears(dateStr, years) {
         var id = btn.getAttribute('data-id');
         var act = btn.getAttribute('data-act');
         if (act === 'review') askReview(id);
+        else if (act === 'detail') {
+          expandedCaseId = (expandedCaseId === id) ? null : id;
+          renderTable();
+        }
         else if (act === 'edit') editCase(id);
         else if (act === 'delete') askDelete(id);
         else if (act === 'withdraw') askWithdraw(id);
         else if (act === 'reactivate') askReactivate(id);
         else if (act === 'del-assess') deleteAssessment(id, btn.getAttribute('data-assess-id'));
+        else if (act === 'edit-assess') openAssessmentModal(id, btn.getAttribute('data-assess-id'));
+        else if (act === 'add-assess') openAssessmentModal(id, null);
         return;
       }
       var mainRow = e.target.closest('tr.case-main-row');
@@ -1887,15 +1979,22 @@ function addYears(dateStr, years) {
           '<td>' + a.cognitiveScore + '</td>' +
           '<td>' + a.mbiScore + '</td>' +
           '<td>' + escapeHtml(a.notes || '—') + '</td>' +
-          '<td class="no-print"><button type="button" class="btn-danger btn-sm" data-act="del-assess" data-id="' +
-            escapeHtml(c.id) + '" data-assess-id="' + escapeHtml(a.id) + '">刪</button></td>' +
+          '<td class="no-print" style="white-space:nowrap;">' +
+            '<button type="button" class="btn-secondary btn-sm" data-act="edit-assess" data-id="' +
+              escapeHtml(c.id) + '" data-assess-id="' + escapeHtml(a.id) + '">編輯</button> ' +
+            '<button type="button" class="btn-danger btn-sm" data-act="del-assess" data-id="' +
+              escapeHtml(c.id) + '" data-assess-id="' + escapeHtml(a.id) + '">刪</button>' +
+          '</td>' +
           '</tr>';
       }).join('');
+      var addBtn = '<div class="no-print" style="margin-bottom:0.45rem;">' +
+        '<button type="button" class="btn-success btn-sm" data-act="add-assess" data-id="' + escapeHtml(c.id) + '">＋ 新增評估紀錄</button>' +
+        '</div>';
       var tableHtml = hist.length
-        ? '<table class="assess-table"><thead><tr>' +
-          '<th>評估日期</th><th>ICP Date 變更</th><th>認知工具</th><th>認知分數</th><th>MBI</th><th>備註</th><th class="no-print"></th>' +
+        ? addBtn + '<table class="assess-table"><thead><tr>' +
+          '<th>評估日期</th><th>ICP Date 變更</th><th>認知工具</th><th>認知分數</th><th>MBI</th><th>備註</th><th class="no-print">操作</th>' +
           '</tr></thead><tbody>' + tableRows + '</tbody></table>'
-        : '<div class="detail-empty">尚未有評估紀錄。請按「覆核」新增每年 ICP 評估分數。</div>';
+        : addBtn + '<div class="detail-empty">尚未有評估紀錄。可按「覆核」或「＋ 新增評估紀錄」加入分數。</div>';
 
       // chart containers: one MBI + one per cognitive tool present
       var toolsUsed = [];
@@ -2674,6 +2773,7 @@ function addYears(dateStr, years) {
 
     // Filter controls — stopPropagation so nothing else eats the click
     document.getElementById('btnSaveReview').addEventListener('click', function () { saveReviewRecord(); });
+    document.getElementById('reviewCogTool').addEventListener('change', function () { syncOtherToolField(); });
 
     document.getElementById('filterStatusBtns').addEventListener('click', function (e) {
       var btn = e.target.closest('button.filter-btn');
