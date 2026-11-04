@@ -64,7 +64,7 @@
       "id": "mtgyq9m9nbwajt",
       "name": "M啟褔",
       "admissionDate": "2020-10-08",
-      "icpDate": "2026-10-03",
+      "icpDate": "2024-10-10",
       "cognitive": "Dementia",
       "otTraining": "No",
       "gerontech": "No",
@@ -72,6 +72,26 @@
       "dischargedAt": null,
       "dischargedMonth": null,
       "assessmentHistory": [
+        {
+          "id": "mw1ql91ht267kd",
+          "date": "2024-10-10",
+          "previousIcpDate": "2025-10-13",
+          "icpDate": "2024-10-10",
+          "cognitiveTool": "AMT",
+          "cognitiveScore": 10,
+          "mbiScore": 98,
+          "notes": ""
+        },
+        {
+          "id": "mw1qjy12vneby6",
+          "date": "2025-10-13",
+          "previousIcpDate": "2026-10-03",
+          "icpDate": "2025-10-13",
+          "cognitiveTool": "HKMoCA-full",
+          "cognitiveScore": 22,
+          "mbiScore": 90,
+          "notes": ""
+        },
         {
           "id": "mw1qiuscxuifb7",
           "date": "2026-10-03",
@@ -84,7 +104,7 @@
         }
       ],
       "createdAt": "2026-08-31T08:14:49.137Z",
-      "updatedAt": "2026-11-04T06:27:40.764Z"
+      "updatedAt": "2026-11-04T06:29:32.549Z"
     },
     {
       "id": "mtgyrgm8d08f5i",
