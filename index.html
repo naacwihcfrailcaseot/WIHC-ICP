@@ -864,7 +864,7 @@
         <div class="form-group">
           <label for="reviewDate">完成 ICP 評估日期 *</label>
           <input type="date" id="reviewDate" required />
-          <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;">此日期會同時寫入評估紀錄，並更新為最新 ICP Date（編輯舊紀錄時不會改動現時 ICP Date）。</div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;">寫入評估紀錄。只有當此日期 ≥ 現時 ICP Date 時才會更新最新 ICP Date；補登過往分數不會改動現時 ICP Date。</div>
         </div>
         <div class="row2">
           <div class="form-group">
@@ -1478,7 +1478,7 @@ function addYears(dateStr, years) {
       } else {
         document.getElementById('reviewModalTitle').textContent = 'ICP 覆核及評估 — ' + c.name;
         document.getElementById('reviewModalHint').textContent =
-          '目前 ICP Date：' + formatDate(c.icpDate) + '。輸入完成評估的日期與分數即可；系統會新增紀錄並更新 ICP Date。';
+          '目前 ICP Date：' + formatDate(c.icpDate) + '。若評估日期 ≥ 現時 ICP Date，會更新 ICP Date；若輸入較早的過往日期，只會新增歷史分數，不會改動最新 ICP Date。';
         document.getElementById('reviewDate').value = today;
         document.getElementById('reviewCogTool').value = 'HKMoCA-5min';
         document.getElementById('reviewOtherTool').value = '';
@@ -1549,26 +1549,34 @@ function addYears(dateStr, years) {
         return;
       }
 
-      // New ICP review: one date = assessment date + new ICP date
-      var prevIcp = c.icpDate;
+      // New assessment record. Only advance case ICP Date if this date is
+      // on or after the current ICP Date (past scores must not overwrite latest ICP).
+      var prevIcp = c.icpDate || '';
+      var shouldUpdateIcp = !prevIcp || date >= prevIcp;
       c.assessmentHistory.push({
         id: uid(),
         date: date,
         previousIcpDate: prevIcp || null,
-        icpDate: date,
+        icpDate: shouldUpdateIcp ? date : prevIcp,
         cognitiveTool: toolName,
         cognitiveScore: Number(cogScore),
         mbiScore: Number(mbi),
         notes: notes
       });
       c.assessmentHistory = normalizeAssessments(c.assessmentHistory);
-      c.icpDate = date;
+      if (shouldUpdateIcp) {
+        c.icpDate = date;
+      }
       c.updatedAt = new Date().toISOString();
-      await persist('覆核個案: ' + c.name);
+      await persist(shouldUpdateIcp ? ('覆核個案: ' + c.name) : ('新增過往評估: ' + c.name));
       closeReviewModal();
       expandedCaseId = c.id;
       refreshAll();
-      toast('已儲存「' + c.name + '」覆核及評估紀錄');
+      if (shouldUpdateIcp) {
+        toast('已儲存覆核紀錄，ICP Date 已更新為 ' + formatDate(date));
+      } else {
+        toast('已新增過往評估紀錄（ICP Date 維持 ' + formatDate(c.icpDate) + '）');
+      }
     }
 
 
@@ -1974,7 +1982,6 @@ function addYears(dateStr, years) {
       var tableRows = hist.slice().reverse().map(function (a) {
         return '<tr>' +
           '<td>' + formatDate(a.date) + '</td>' +
-          '<td>' + formatDate(a.previousIcpDate) + ' → ' + formatDate(a.icpDate) + '</td>' +
           '<td>' + escapeHtml(a.cognitiveTool) + '</td>' +
           '<td>' + a.cognitiveScore + '</td>' +
           '<td>' + a.mbiScore + '</td>' +
@@ -1992,7 +1999,7 @@ function addYears(dateStr, years) {
         '</div>';
       var tableHtml = hist.length
         ? addBtn + '<table class="assess-table"><thead><tr>' +
-          '<th>評估日期</th><th>ICP Date 變更</th><th>認知工具</th><th>認知分數</th><th>MBI</th><th>備註</th><th class="no-print">操作</th>' +
+          '<th>評估日期</th><th>認知工具</th><th>認知分數</th><th>MBI</th><th>備註</th><th class="no-print">操作</th>' +
           '</tr></thead><tbody>' + tableRows + '</tbody></table>'
         : addBtn + '<div class="detail-empty">尚未有評估紀錄。可按「覆核」或「＋ 新增評估紀錄」加入分數。</div>';
 
