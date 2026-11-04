@@ -7,19 +7,19 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      --bg: #eef2f6;
+      --bg: #eef5f0;
       --card: #ffffff;
-      --primary: #1e3a5f;
-      --primary-mid: #2c5282;
-      --primary-light: #ebf2f9;
-      --accent: #2b6cb0;
+      --primary: #0f3d2e;
+      --primary-mid: #1b5e45;
+      --primary-light: #e6f2eb;
+      --accent: #2f6f4e;
       --success: #276749;
       --warning: #975a16;
       --danger: #9b2c2c;
-      --muted: #5a6a7a;
-      --border: #d0d8e0;
-      --text: #1a2332;
-      --shadow: 0 1px 2px rgb(30 58 95 / 0.06), 0 1px 3px rgb(30 58 95 / 0.04);
+      --muted: #5a6a62;
+      --border: #c5d6cc;
+      --text: #14241c;
+      --shadow: 0 1px 2px rgb(15 61 46 / 0.07), 0 1px 3px rgb(15 61 46 / 0.05);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -30,10 +30,10 @@
       min-height: 100vh;
     }
     header {
-      background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+      background: linear-gradient(135deg, #0a2f22 0%, #1b5e45 55%, #2f6f4e 100%);
       color: #fff;
       padding: 1rem 1.5rem;
-      box-shadow: 0 2px 8px rgb(26 54 93 / 0.2);
+      box-shadow: 0 2px 8px rgb(10 47 34 / 0.25);
     }
     header h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: 0.02em; }
     header p { opacity: 0.88; font-size: 0.82rem; margin-top: 0.15rem; }
@@ -289,6 +289,45 @@
     }
     .gt-conflict.show { display: block; }
     .badge-device { background: #e9d8fd; color: #553c9a; }
+    tr.case-main-row { cursor: pointer; }
+    tr.case-main-row:hover { background: #f0f7f3; }
+    tr.case-main-row.is-open { background: #e6f2eb; }
+    tr.case-detail-row td {
+      background: #f7faf8; border-top: none;
+      padding: 0.75rem 0.9rem 1rem;
+    }
+    .detail-panel { max-width: 100%; }
+    .detail-panel h4 {
+      font-size: 0.85rem; color: var(--primary); margin: 0 0 0.45rem;
+    }
+    .detail-grid {
+      display: grid; grid-template-columns: 1.1fr 1fr;
+      gap: 0.75rem;
+    }
+    @media (max-width: 900px) { .detail-grid { grid-template-columns: 1fr; } }
+    .assess-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    .assess-table th, .assess-table td {
+      border: 1px solid var(--border); padding: 0.3rem 0.4rem; text-align: left;
+    }
+    .assess-table th { background: var(--primary-light); color: var(--primary); }
+    .detail-charts { display: flex; flex-direction: column; gap: 0.65rem; }
+    .detail-chart-box {
+      border: 1px solid var(--border); border-radius: 6px;
+      background: #fff; padding: 0.4rem 0.5rem 0.3rem;
+    }
+    .detail-chart-box h5 {
+      font-size: 0.75rem; color: var(--primary); margin: 0 0 0.25rem; font-weight: 600;
+    }
+    .detail-chart-box .chart-h { height: 160px; position: relative; }
+    .detail-empty { font-size: 0.8rem; color: var(--muted); padding: 0.5rem 0; }
+    .modal.wide { max-width: 520px; }
+    .review-form .form-group { margin-bottom: 0.55rem; }
+    .review-form label { display: block; font-size: 0.78rem; font-weight: 600; margin-bottom: 0.2rem; color: var(--primary); }
+    .review-form input, .review-form select, .review-form textarea {
+      width: 100%; padding: 0.4rem 0.5rem; border: 1px solid var(--border); border-radius: 5px; font-size: 0.85rem;
+    }
+    .review-form .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+
 
 
     .table-wrap { overflow-x: auto; }
@@ -331,7 +370,7 @@
     }
     .filter-btn:hover { background: #e2e8f0; }
     .filter-btn.is-on {
-      background: #2c5282; color: #fff; border-color: #2c5282;
+      background: var(--primary-mid); color: #fff; border-color: var(--primary-mid);
     }
     .alpha-filters {
       display: flex; flex-wrap: wrap; gap: 0.25rem;
@@ -347,7 +386,7 @@
     }
     .alpha-btn:hover { background: #e2e8f0; }
     .alpha-btn.is-on {
-      background: #2c5282; color: #fff; border-color: #2c5282;
+      background: var(--primary-mid); color: #fff; border-color: var(--primary-mid);
     }
     .alpha-btn.alpha-wide { min-width: auto; padding: 0 0.45rem; font-weight: 500; }
 
@@ -423,7 +462,7 @@
         overflow: visible !important;
       }
       header {
-        background: #1a365d !important;
+        background: #0a2f22 !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
         box-shadow: none !important;
@@ -815,6 +854,58 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="reviewModal">
+    <div class="modal wide">
+      <h3 id="reviewModalTitle">ICP 覆核及評估</h3>
+      <p id="reviewModalHint" style="font-size:0.82rem;color:var(--muted);margin-bottom:0.6rem;"></p>
+      <form class="review-form" id="reviewForm" autocomplete="off" onsubmit="return false;">
+        <input type="hidden" id="reviewCaseId" />
+        <div class="row2">
+          <div class="form-group">
+            <label for="reviewDate">評估／覆核日期 *</label>
+            <input type="date" id="reviewDate" required />
+          </div>
+          <div class="form-group">
+            <label for="reviewIcpDate">新 ICP Date *</label>
+            <input type="date" id="reviewIcpDate" required />
+          </div>
+        </div>
+        <div class="row2">
+          <div class="form-group">
+            <label for="reviewCogTool">認知評估工具 *</label>
+            <select id="reviewCogTool" required>
+              <option value="HKMoCA-5min">HKMoCA-5min</option>
+              <option value="HKMoCA-full">HKMoCA-full</option>
+              <option value="HKBC">HKBC</option>
+              <option value="AMT">AMT</option>
+              <option value="CDR">CDR</option>
+              <option value="other">other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="reviewCogScore">認知分數 *</label>
+            <input type="number" id="reviewCogScore" step="any" required placeholder="例如：22" />
+          </div>
+        </div>
+        <div class="row2">
+          <div class="form-group">
+            <label for="reviewMbi">MBI（ADL）分數 *</label>
+            <input type="number" id="reviewMbi" step="any" min="0" max="100" required placeholder="0–100" />
+          </div>
+          <div class="form-group">
+            <label for="reviewNotes">備註</label>
+            <input type="text" id="reviewNotes" placeholder="選填" />
+          </div>
+        </div>
+        <p style="font-size:0.75rem;color:var(--muted);margin:0.2rem 0 0.5rem;">舊 ICP Date 及過往分數會保留在評估紀錄中，不會因更新而消失。</p>
+      </form>
+      <div class="btn-row">
+        <button type="button" class="btn-secondary" onclick="closeReviewModal()">取消</button>
+        <button type="button" class="btn-primary" id="btnSaveReview">儲存覆核紀錄</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="configModal">
     <div class="modal">
       <h3>GitHub Token 設定</h3>
@@ -855,6 +946,8 @@
     let devices = [];   // [{id, name, note}]
     let bookings = [];  // [{id, deviceId, caseId, date, startTime, endTime, note}]
     let charts = { cognitive: null, ot: null, gerontech: null };
+    let detailCharts = {}; // id -> Chart instances for expanded rows
+    let expandedCaseId = null;
     let pendingAction = null;
     let fileSha = null;
     let saving = false;
@@ -862,9 +955,13 @@
 
     const COLORS = {
       cognitive: ['#2C7A7B', '#D69E2E', '#DD6B20', '#C53030'],
-      binary: ['#2B6CB0', '#A0AEC0'],
-      gerontech: ['#553C9A', '#A0AEC0']
+      binary: ['#2F6F4E', '#A0AEC0'],
+      gerontech: ['#1B5E45', '#A0AEC0'],
+      line: ['#1B5E45', '#2F6F4E', '#C05621', '#2B6CB0', '#805AD5', '#C53030']
     };
+
+    var COG_TOOLS = ['HKMoCA-5min', 'HKMoCA-full', 'HKBC', 'AMT', 'CDR', 'other'];
+
 
     function getToken() { return (localStorage.getItem(TOKEN_KEY) || '').trim(); }
     function setToken(t) {
@@ -935,6 +1032,7 @@
           status: status,
           dischargedAt: c.dischargedAt || null,
           dischargedMonth: dMonth || null,
+          assessmentHistory: normalizeAssessments(c.assessmentHistory),
           createdAt: c.createdAt || new Date().toISOString(),
           updatedAt: c.updatedAt || new Date().toISOString()
         };
@@ -942,6 +1040,34 @@
     }
 
     function isActive(c) { return c && c.status !== 'discharged'; }
+
+    function normalizeAssessments(arr) {
+      if (!Array.isArray(arr)) return [];
+      return arr.map(function (a) {
+        if (!a || typeof a !== 'object') return null;
+        var tool = String(a.cognitiveTool || a.tool || 'other').trim();
+        if (COG_TOOLS.indexOf(tool) === -1) tool = 'other';
+        var score = a.cognitiveScore;
+        if (score === undefined || score === null || score === '') return null;
+        var mbi = a.mbiScore;
+        if (mbi === undefined || mbi === null || mbi === '') return null;
+        return {
+          id: a.id || uid(),
+          date: a.date || a.assessmentDate || '',
+          previousIcpDate: a.previousIcpDate || null,
+          icpDate: a.icpDate || a.date || '',
+          cognitiveTool: tool,
+          cognitiveScore: Number(score),
+          mbiScore: Number(mbi),
+          notes: String(a.notes || '').trim()
+        };
+      }).filter(function (a) { return a && a.date; })
+        .sort(function (a, b) {
+          if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+          return 0;
+        });
+    }
+
 
     function applyDocument(doc) {
       if (Array.isArray(doc)) {
@@ -1269,6 +1395,7 @@ function addYears(dateStr, years) {
           id: uid(), name: name, admissionDate: admissionDate, icpDate: icpDate,
           cognitive: cognitive, otTraining: otTraining, gerontech: gerontech,
           status: 'active',
+          assessmentHistory: [],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         });
@@ -1307,14 +1434,60 @@ function addYears(dateStr, years) {
     function askReview(id) {
       var c = cases.find(function (x) { return x.id === id; });
       if (!c) return;
-      openModal('完成 ICP 覆核', '確定為「' + c.name + '」完成覆核？ICP Date 將更新為今日，下次覆核期限將自動延後一年。', async function () {
-        c.icpDate = new Date().toISOString().slice(0, 10);
-        c.updatedAt = new Date().toISOString();
-        await persist('覆核個案: ' + c.name);
-        refreshAll();
-        toast('已完成「' + c.name + '」覆核');
-      });
+      var today = new Date().toISOString().slice(0, 10);
+      document.getElementById('reviewCaseId').value = c.id;
+      document.getElementById('reviewModalTitle').textContent = 'ICP 覆核及評估 — ' + c.name;
+      document.getElementById('reviewModalHint').textContent =
+        '目前 ICP Date：' + formatDate(c.icpDate) + '。儲存後會新增一筆評估紀錄，並更新 ICP Date（舊紀錄保留）。';
+      document.getElementById('reviewDate').value = today;
+      document.getElementById('reviewIcpDate').value = today;
+      document.getElementById('reviewCogTool').value = 'HKMoCA-5min';
+      document.getElementById('reviewCogScore').value = '';
+      document.getElementById('reviewMbi').value = '';
+      document.getElementById('reviewNotes').value = '';
+      document.getElementById('reviewModal').classList.add('show');
     }
+
+    function closeReviewModal() {
+      document.getElementById('reviewModal').classList.remove('show');
+    }
+
+    async function saveReviewRecord() {
+      var id = document.getElementById('reviewCaseId').value;
+      var c = cases.find(function (x) { return x.id === id; });
+      if (!c) return;
+      var date = document.getElementById('reviewDate').value;
+      var newIcp = document.getElementById('reviewIcpDate').value;
+      var tool = document.getElementById('reviewCogTool').value;
+      var cogScore = document.getElementById('reviewCogScore').value;
+      var mbi = document.getElementById('reviewMbi').value;
+      var notes = document.getElementById('reviewNotes').value.trim();
+      if (!date || !newIcp || cogScore === '' || mbi === '') {
+        toast('請填寫日期、認知分數及 MBI');
+        return;
+      }
+      if (!Array.isArray(c.assessmentHistory)) c.assessmentHistory = [];
+      var prevIcp = c.icpDate;
+      c.assessmentHistory.push({
+        id: uid(),
+        date: date,
+        previousIcpDate: prevIcp || null,
+        icpDate: newIcp,
+        cognitiveTool: tool,
+        cognitiveScore: Number(cogScore),
+        mbiScore: Number(mbi),
+        notes: notes
+      });
+      c.assessmentHistory = normalizeAssessments(c.assessmentHistory);
+      c.icpDate = newIcp;
+      c.updatedAt = new Date().toISOString();
+      await persist('覆核個案: ' + c.name);
+      closeReviewModal();
+      expandedCaseId = c.id;
+      refreshAll();
+      toast('已儲存「' + c.name + '」覆核及評估紀錄');
+    }
+
 
     function askDelete(id) {
       var c = cases.find(function (x) { return x.id === id; });
@@ -1623,6 +1796,7 @@ function addYears(dateStr, years) {
         }
         if (empty) empty.style.display = 'none';
 
+        destroyDetailCharts();
         var html = '';
         for (var i = 0; i < list.length; i++) {
           var c = list[i];
@@ -1631,8 +1805,12 @@ function addYears(dateStr, years) {
           var status = getReviewStatus(c);
           var due = nextReviewDue(c.icpDate);
           var dMonthShow = c.dischargedMonth || (c.dischargedAt ? String(c.dischargedAt).slice(0, 7) : '');
-          html += '<tr data-id="' + escapeHtml(cid) + '">' +
-            '<td><strong>' + escapeHtml(c.name || '') + '</strong></td>' +
+          var isOpen = expandedCaseId === cid;
+          var histCount = (c.assessmentHistory && c.assessmentHistory.length) || 0;
+          html += '<tr class="case-main-row' + (isOpen ? ' is-open' : '') + '" data-id="' + escapeHtml(cid) + '" data-row="main">' +
+            '<td><strong>' + escapeHtml(c.name || '') + '</strong>' +
+              (histCount ? ' <span style="font-size:0.7rem;color:var(--muted);">(' + histCount + ' 次評估)</span>' : '') +
+            '</td>' +
             '<td>' + formatDate(c.admissionDate) + '</td>' +
             '<td>' + formatDate(c.icpDate) + '</td>' +
             '<td>' + (isActive(c) ? formatDate(due) : '—') + '</td>' +
@@ -1652,8 +1830,16 @@ function addYears(dateStr, years) {
                   '<button type="button" class="btn-danger btn-sm" data-act="delete" data-id="' + escapeHtml(cid) + '">刪除</button>'
               ) +
             '</td></tr>';
+          if (isOpen) {
+            html += '<tr class="case-detail-row" data-id="' + escapeHtml(cid) + '" data-row="detail">' +
+              '<td colspan="10">' + buildDetailPanelHtml(c) + '</td></tr>';
+          }
         }
         tbody.innerHTML = html;
+        if (expandedCaseId) {
+          var openCase = list.find(function (x) { return x && x.id === expandedCaseId; });
+          if (openCase) renderDetailCharts(openCase);
+        }
       } catch (err) {
         console.error('renderTable error', err);
         toast('列表顯示錯誤: ' + (err && err.message ? err.message : err));
@@ -1663,17 +1849,181 @@ function addYears(dateStr, years) {
     // Single delegated listener (register once)
     document.getElementById('caseTableBody').addEventListener('click', function (e) {
       var btn = e.target.closest('button[data-act]');
-      if (!btn) return;
-      e.preventDefault();
-      e.stopPropagation();
-      var id = btn.getAttribute('data-id');
-      var act = btn.getAttribute('data-act');
-      if (act === 'review') askReview(id);
-      else if (act === 'edit') editCase(id);
-      else if (act === 'delete') askDelete(id);
-      else if (act === 'withdraw') askWithdraw(id);
-      else if (act === 'reactivate') askReactivate(id);
+      if (btn) {
+        e.preventDefault();
+        e.stopPropagation();
+        var id = btn.getAttribute('data-id');
+        var act = btn.getAttribute('data-act');
+        if (act === 'review') askReview(id);
+        else if (act === 'edit') editCase(id);
+        else if (act === 'delete') askDelete(id);
+        else if (act === 'withdraw') askWithdraw(id);
+        else if (act === 'reactivate') askReactivate(id);
+        else if (act === 'del-assess') deleteAssessment(id, btn.getAttribute('data-assess-id'));
+        return;
+      }
+      var mainRow = e.target.closest('tr.case-main-row');
+      if (mainRow) {
+        var rid = mainRow.getAttribute('data-id');
+        expandedCaseId = (expandedCaseId === rid) ? null : rid;
+        renderTable();
+      }
     });
+
+    function destroyDetailCharts() {
+      Object.keys(detailCharts).forEach(function (k) {
+        try { detailCharts[k].destroy(); } catch (e) {}
+      });
+      detailCharts = {};
+    }
+
+    function buildDetailPanelHtml(c) {
+      var hist = normalizeAssessments(c.assessmentHistory || []);
+      var tableRows = hist.slice().reverse().map(function (a) {
+        return '<tr>' +
+          '<td>' + formatDate(a.date) + '</td>' +
+          '<td>' + formatDate(a.previousIcpDate) + ' → ' + formatDate(a.icpDate) + '</td>' +
+          '<td>' + escapeHtml(a.cognitiveTool) + '</td>' +
+          '<td>' + a.cognitiveScore + '</td>' +
+          '<td>' + a.mbiScore + '</td>' +
+          '<td>' + escapeHtml(a.notes || '—') + '</td>' +
+          '<td class="no-print"><button type="button" class="btn-danger btn-sm" data-act="del-assess" data-id="' +
+            escapeHtml(c.id) + '" data-assess-id="' + escapeHtml(a.id) + '">刪</button></td>' +
+          '</tr>';
+      }).join('');
+      var tableHtml = hist.length
+        ? '<table class="assess-table"><thead><tr>' +
+          '<th>評估日期</th><th>ICP Date 變更</th><th>認知工具</th><th>認知分數</th><th>MBI</th><th>備註</th><th class="no-print"></th>' +
+          '</tr></thead><tbody>' + tableRows + '</tbody></table>'
+        : '<div class="detail-empty">尚未有評估紀錄。請按「覆核」新增每年 ICP 評估分數。</div>';
+
+      // chart containers: one MBI + one per cognitive tool present
+      var toolsUsed = [];
+      hist.forEach(function (a) {
+        if (toolsUsed.indexOf(a.cognitiveTool) === -1) toolsUsed.push(a.cognitiveTool);
+      });
+      var chartHtml = '';
+      if (hist.length) {
+        chartHtml += '<div class="detail-chart-box"><h5>MBI（ADL）趨勢</h5><div class="chart-h"><canvas id="chart-mbi-' +
+          escapeHtml(c.id) + '"></canvas></div></div>';
+        toolsUsed.forEach(function (tool) {
+          var safe = String(tool).replace(/[^a-zA-Z0-9_-]/g, '_');
+          chartHtml += '<div class="detail-chart-box"><h5>認知分數趨勢 — ' + escapeHtml(tool) +
+            '</h5><div class="chart-h"><canvas id="chart-cog-' + escapeHtml(c.id) + '-' + safe +
+            '"></canvas></div></div>';
+        });
+      }
+
+      return '<div class="detail-panel"><div class="detail-grid">' +
+        '<div><h4>評估／ICP 歷史紀錄</h4>' + tableHtml + '</div>' +
+        '<div><h4>表現趨勢</h4><div class="detail-charts">' +
+        (chartHtml || '<div class="detail-empty">暫無圖表</div>') +
+        '</div></div></div></div>';
+    }
+
+    function renderDetailCharts(c) {
+      var hist = normalizeAssessments(c.assessmentHistory || []);
+      if (!hist.length) return;
+
+      // MBI chart (all records chronologically)
+      var mbiLabels = hist.map(function (a) { return a.date; });
+      var mbiData = hist.map(function (a) { return a.mbiScore; });
+      var mbiCanvas = document.getElementById('chart-mbi-' + c.id);
+      if (mbiCanvas) {
+        detailCharts['mbi-' + c.id] = new Chart(mbiCanvas, {
+          type: 'line',
+          data: {
+            labels: mbiLabels,
+            datasets: [{
+              label: 'MBI',
+              data: mbiData,
+              borderColor: COLORS.line[0],
+              backgroundColor: 'rgba(27,94,69,0.12)',
+              tension: 0.25,
+              fill: true,
+              pointRadius: 3
+            }]
+          },
+          options: lineChartOptions('MBI')
+        });
+      }
+
+      // Cognitive: separate chart per tool
+      var byTool = {};
+      hist.forEach(function (a) {
+        if (!byTool[a.cognitiveTool]) byTool[a.cognitiveTool] = [];
+        byTool[a.cognitiveTool].push(a);
+      });
+      var toolKeys = Object.keys(byTool);
+      toolKeys.forEach(function (tool, idx) {
+        var safe = String(tool).replace(/[^a-zA-Z0-9_-]/g, '_');
+        var canvas = document.getElementById('chart-cog-' + c.id + '-' + safe);
+        if (!canvas) return;
+        var series = byTool[tool].slice().sort(function (a, b) {
+          return a.date < b.date ? -1 : 1;
+        });
+        // only meaningful line if >=1 point; still show single points
+        var color = COLORS.line[(idx + 1) % COLORS.line.length];
+        detailCharts['cog-' + c.id + '-' + safe] = new Chart(canvas, {
+          type: 'line',
+          data: {
+            labels: series.map(function (a) { return a.date; }),
+            datasets: [{
+              label: tool,
+              data: series.map(function (a) { return a.cognitiveScore; }),
+              borderColor: color,
+              backgroundColor: color.replace(')', ',0.12)').replace('rgb', 'rgba').replace('#', ''),
+              // simpler fill
+              tension: 0.25,
+              fill: false,
+              pointRadius: 3
+            }]
+          },
+          options: lineChartOptions(tool)
+        });
+        // fix backgroundColor for hex
+        var ch = detailCharts['cog-' + c.id + '-' + safe];
+        if (ch) {
+          ch.data.datasets[0].backgroundColor = 'rgba(27,94,69,0.08)';
+          ch.update();
+        }
+      });
+    }
+
+    function lineChartOptions(title) {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } },
+          title: { display: false }
+        },
+        scales: {
+          x: {
+            ticks: { font: { size: 10 }, maxRotation: 45, minRotation: 0 },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          y: {
+            ticks: { font: { size: 10 } },
+            grid: { color: 'rgba(0,0,0,0.06)' }
+          }
+        }
+      };
+    }
+
+    function deleteAssessment(caseId, assessId) {
+      var c = cases.find(function (x) { return x.id === caseId; });
+      if (!c) return;
+      openModal('刪除評估紀錄', '確定刪除此筆評估紀錄？不會還原 ICP Date。', async function () {
+        c.assessmentHistory = (c.assessmentHistory || []).filter(function (a) { return a.id !== assessId; });
+        c.updatedAt = new Date().toISOString();
+        await persist('刪除評估紀錄: ' + c.name);
+        expandedCaseId = caseId;
+        refreshAll();
+        toast('評估紀錄已刪除');
+      }, true);
+    }
+
 
     function makePieOptions(total) {
       return {
@@ -2323,6 +2673,8 @@ function addYears(dateStr, years) {
     }
 
     // Filter controls — stopPropagation so nothing else eats the click
+    document.getElementById('btnSaveReview').addEventListener('click', function () { saveReviewRecord(); });
+
     document.getElementById('filterStatusBtns').addEventListener('click', function (e) {
       var btn = e.target.closest('button.filter-btn');
       if (!btn) return;
