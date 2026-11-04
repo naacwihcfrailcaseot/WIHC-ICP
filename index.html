@@ -333,6 +333,24 @@
     .filter-btn.is-on {
       background: #2c5282; color: #fff; border-color: #2c5282;
     }
+    .alpha-filters {
+      display: flex; flex-wrap: wrap; gap: 0.25rem;
+      margin: 0 0 0.55rem 0; padding: 0.4rem 0.15rem 0.15rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .alpha-btn {
+      min-width: 1.7rem; height: 1.7rem; padding: 0 0.3rem;
+      font-size: 0.72rem; font-weight: 600;
+      border-radius: 4px; border: 1px solid #cbd5e0;
+      background: #edf2f7; color: #2d3748;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .alpha-btn:hover { background: #e2e8f0; }
+    .alpha-btn.is-on {
+      background: #2c5282; color: #fff; border-color: #2c5282;
+    }
+    .alpha-btn.alpha-wide { min-width: auto; padding: 0 0.45rem; font-weight: 500; }
+
     .case-combo { position: relative; flex: 1 1 160px; min-width: 140px; }
     .case-combo input { width: 100%; }
     .case-combo-list {
@@ -491,7 +509,7 @@
     <div class="header-row">
       <div>
         <h1>個案資料庫 Case Database</h1>
-        <p>最高服務量 70 人 · 每年 ICP 覆核 · 覆核期限前一個月必須完成</p>
+        <p>最高服務量 72 人 · 每年 ICP 覆核 · 覆核期限前一個月必須完成</p>
       </div>
       <div class="header-actions">
         <div class="sync-status" id="syncStatus">
@@ -513,7 +531,7 @@
     <div class="stats-bar">
       <div class="stat-card">
         <div class="num" id="statActive">0</div>
-        <div class="label">在籍個案 / 70</div>
+        <div class="label">在籍個案 / 72</div>
         <div class="caseload-bar"><div class="caseload-fill" id="caseloadFill" style="width:0%"></div></div>
       </div>
       <div class="stat-card success">
@@ -618,6 +636,7 @@
                  value="" data-lpignore="true" data-form-type="other" />
           <span id="tableDebug" style="font-size:0.72rem;color:#5a6a7a;margin-left:0.25rem;"></span>
         </div>
+        <div class="alpha-filters no-print" id="alphaFilters" title="按姓名首字母篩選"></div>
         <div class="table-wrap">
           <table>
             <thead>
@@ -828,7 +847,7 @@
     const GH_PATH   = 'data.json';
     // ============================================================
 
-    const MAX_CASELOAD = 70;
+    const MAX_CASELOAD = 72;
     const LOCAL_KEY = 'ot_case_db_v2';
     const TOKEN_KEY = 'ot_case_db_gh_token';
 
@@ -1243,7 +1262,7 @@ function addYears(dateStr, years) {
         toast('個案已更新');
       } else {
         if (cases.filter(isActive).length >= MAX_CASELOAD) {
-          toast('已達最高服務量 70 人');
+          toast('已達最高服務量 72 人');
           return;
         }
         cases.push({
@@ -1333,7 +1352,7 @@ function addYears(dateStr, years) {
       if (!c) return;
       if (c.status !== 'discharged') return;
       if (cases.filter(isActive).length >= MAX_CASELOAD) {
-        toast('已達最高服務量 70 人，無法重新入會');
+        toast('已達最高服務量 72 人，無法重新入會');
         return;
       }
       openModal('重新入會', '確定將「' + c.name + '」重新標記為在籍？', async function () {
@@ -1434,6 +1453,8 @@ function addYears(dateStr, years) {
 
     // Default: show ALL cases (no「在籍」button). Filters only narrow the list.
     var currentStatusFilter = 'all';
+    var currentLetterFilter = ''; // '' = all letters; 'A'-'Z'; 'OTHER' = non A-Z start
+
 
     /** Values browsers often autofill that are NOT case names */
     function isJunkSearch(v) {
@@ -1469,6 +1490,41 @@ function addYears(dateStr, years) {
       }
       renderTable();
     }
+
+    function nameFirstLetter(name) {
+      var s = String(name || '').trim();
+      if (!s) return '';
+      var ch = s.charAt(0).toUpperCase();
+      if (ch >= 'A' && ch <= 'Z') return ch;
+      return 'OTHER';
+    }
+
+    function setLetterFilter(letter) {
+      currentLetterFilter = letter || '';
+      var box = document.getElementById('alphaFilters');
+      if (box) {
+        var btns = box.querySelectorAll('.alpha-btn');
+        for (var i = 0; i < btns.length; i++) {
+          var v = btns[i].getAttribute('data-letter') || '';
+          if (v === currentLetterFilter) btns[i].classList.add('is-on');
+          else btns[i].classList.remove('is-on');
+        }
+      }
+      renderTable();
+    }
+
+    function buildAlphaFilters() {
+      var box = document.getElementById('alphaFilters');
+      if (!box) return;
+      var letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+      var html = '<button type="button" class="alpha-btn alpha-wide is-on" data-letter="">全部字母</button>';
+      for (var i = 0; i < letters.length; i++) {
+        html += '<button type="button" class="alpha-btn" data-letter="' + letters[i] + '">' + letters[i] + '</button>';
+      }
+      html += '<button type="button" class="alpha-btn alpha-wide" data-letter="OTHER" title="中文或其他非英文字首">其他</button>';
+      box.innerHTML = html;
+    }
+
 
     function renderTable() {
       try {
@@ -1525,6 +1581,12 @@ function addYears(dateStr, years) {
           });
         }
 
+        if (currentLetterFilter) {
+          list = list.filter(function (c) {
+            return nameFirstLetter(c && c.name) === currentLetterFilter;
+          });
+        }
+
         if (statusFilter === 'due') {
           list = sortByReviewDueAsc(list);
         } else if (statusFilter === 'discharged') {
@@ -1550,7 +1612,7 @@ function addYears(dateStr, years) {
         if (countEl) countEl.textContent = '（' + list.length + '）';
         if (dbg) {
           dbg.textContent = '資料庫: ' + totalAll + ' · 在籍: ' + totalActive + ' · 顯示: ' + list.length +
-            ' · 篩選: ' + statusFilter;
+            ' · 篩選: ' + statusFilter + (currentLetterFilter ? (' · 字母: ' + currentLetterFilter) : '');
         }
         if (!tbody) return;
 
@@ -2269,6 +2331,13 @@ function addYears(dateStr, years) {
       var f = btn.getAttribute('data-filter') || 'all';
       setStatusFilter(f);
     });
+    document.getElementById('alphaFilters').addEventListener('click', function (e) {
+      var btn = e.target.closest('button.alpha-btn');
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setLetterFilter(btn.getAttribute('data-letter') || '');
+    });
     document.getElementById('filterCognitive').addEventListener('change', function () { renderTable(); });
     document.getElementById('searchName').addEventListener('input', function () { renderTable(); });
 
@@ -2312,6 +2381,8 @@ function addYears(dateStr, years) {
 
     (async function init() {
       currentStatusFilter = 'all';
+      currentLetterFilter = '';
+      buildAlphaFilters();
       clearCaseSearchBox();
       // Clear again shortly after load (some browsers autofill late)
       setTimeout(clearCaseSearchBox, 100);
