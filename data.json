@@ -71,9 +71,20 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
-      "assessmentHistory": [],
+      "assessmentHistory": [
+        {
+          "id": "mw1qiuscxuifb7",
+          "date": "2026-10-03",
+          "previousIcpDate": "2026-10-03",
+          "icpDate": "2026-10-03",
+          "cognitiveTool": "HKBC",
+          "cognitiveScore": 24,
+          "mbiScore": 90,
+          "notes": ""
+        }
+      ],
       "createdAt": "2026-08-31T08:14:49.137Z",
-      "updatedAt": "2026-10-05T09:43:56.140Z"
+      "updatedAt": "2026-11-04T06:27:40.764Z"
     },
     {
       "id": "mtgyrgm8d08f5i",
