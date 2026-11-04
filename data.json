@@ -11,6 +11,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:01:19.299Z",
       "updatedAt": "2026-11-04T05:25:20.272Z"
     },
@@ -25,6 +26,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:08:41.226Z",
       "updatedAt": "2026-08-31T08:08:41.226Z"
     },
@@ -39,6 +41,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:12:04.303Z",
       "updatedAt": "2026-08-31T08:12:04.303Z"
     },
@@ -53,6 +56,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:12:57.003Z",
       "updatedAt": "2026-10-16T05:16:48.725Z"
     },
@@ -67,6 +71,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:14:49.137Z",
       "updatedAt": "2026-10-05T09:43:56.140Z"
     },
@@ -81,6 +86,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:15:44.864Z",
       "updatedAt": "2026-10-31T08:45:25.705Z"
     },
@@ -88,15 +94,27 @@
       "id": "mtgytqtqygdr29",
       "name": "W妙顏",
       "admissionDate": "2020-10-19",
-      "icpDate": "2026-10-23",
+      "icpDate": "2027-10-22",
       "cognitive": "MCI",
       "otTraining": "Yes",
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [
+        {
+          "id": "mw1pcsfb9zwbv4",
+          "date": "2026-10-23",
+          "previousIcpDate": "2026-10-23",
+          "icpDate": "2027-10-22",
+          "cognitiveTool": "HKMoCA-5min",
+          "cognitiveScore": 15,
+          "mbiScore": 78,
+          "notes": ""
+        }
+      ],
       "createdAt": "2026-08-31T08:17:31.406Z",
-      "updatedAt": "2026-10-23T09:40:49.598Z"
+      "updatedAt": "2026-11-04T05:54:58.151Z"
     },
     {
       "id": "mtgyv0e6yizx6a",
@@ -109,6 +127,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:18:30.462Z",
       "updatedAt": "2026-10-22T05:03:56.033Z"
     },
@@ -123,6 +142,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:19:19.164Z",
       "updatedAt": "2026-09-15T05:52:00.305Z"
     },
@@ -137,6 +157,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:20:01.254Z",
       "updatedAt": "2026-10-14T05:40:33.375Z"
     },
@@ -151,6 +172,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:20:45.676Z",
       "updatedAt": "2026-09-29T08:55:28.377Z"
     },
@@ -165,6 +187,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:21:40.839Z",
       "updatedAt": "2026-10-07T05:22:51.369Z"
     },
@@ -179,6 +202,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:22:36.348Z",
       "updatedAt": "2026-08-31T08:22:36.348Z"
     },
@@ -193,6 +217,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:23:45.853Z",
       "updatedAt": "2026-08-31T08:23:45.853Z"
     },
@@ -207,6 +232,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:24:44.093Z",
       "updatedAt": "2026-08-31T08:24:44.093Z"
     },
@@ -221,6 +247,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:25:34.878Z",
       "updatedAt": "2026-08-31T08:25:34.878Z"
     },
@@ -235,6 +262,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:26:18.466Z",
       "updatedAt": "2026-08-31T08:26:18.466Z"
     },
@@ -249,6 +277,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:27:35.823Z",
       "updatedAt": "2026-08-31T08:27:35.823Z"
     },
@@ -263,6 +292,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:28:23.602Z",
       "updatedAt": "2026-09-21T03:33:48.471Z"
     },
@@ -277,6 +307,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:29:01.862Z",
       "updatedAt": "2026-08-31T08:29:01.862Z"
     },
@@ -291,6 +322,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:29:59.430Z",
       "updatedAt": "2026-08-31T08:29:59.430Z"
     },
@@ -305,6 +337,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:30:58.276Z",
       "updatedAt": "2026-10-14T08:05:19.794Z"
     },
@@ -319,6 +352,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:31:51.536Z",
       "updatedAt": "2026-11-04T01:10:22.352Z"
     },
@@ -333,6 +367,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:32:33.347Z",
       "updatedAt": "2026-08-31T08:32:33.347Z"
     },
@@ -347,6 +382,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:33:50.552Z",
       "updatedAt": "2026-08-31T08:33:50.552Z"
     },
@@ -361,6 +397,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:35:03.427Z",
       "updatedAt": "2026-08-31T08:35:03.427Z"
     },
@@ -375,6 +412,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:35:38.053Z",
       "updatedAt": "2026-08-31T08:35:38.053Z"
     },
@@ -389,6 +427,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:36:36.628Z",
       "updatedAt": "2026-08-31T08:36:36.628Z"
     },
@@ -403,6 +442,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:37:37.448Z",
       "updatedAt": "2026-08-31T08:37:37.448Z"
     },
@@ -417,6 +457,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:38:22.382Z",
       "updatedAt": "2026-08-31T08:38:22.382Z"
     },
@@ -431,6 +472,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:38:56.594Z",
       "updatedAt": "2026-08-31T08:38:56.594Z"
     },
@@ -445,6 +487,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:39:35.523Z",
       "updatedAt": "2026-08-31T08:39:35.523Z"
     },
@@ -459,6 +502,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:40:12.401Z",
       "updatedAt": "2026-08-31T08:40:12.401Z"
     },
@@ -473,6 +517,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:41:04.985Z",
       "updatedAt": "2026-08-31T08:41:04.985Z"
     },
@@ -487,6 +532,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:41:47.682Z",
       "updatedAt": "2026-08-31T08:41:47.682Z"
     },
@@ -501,6 +547,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:42:34.149Z",
       "updatedAt": "2026-08-31T08:42:34.149Z"
     },
@@ -515,6 +562,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:43:15.069Z",
       "updatedAt": "2026-08-31T08:43:15.069Z"
     },
@@ -529,6 +577,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:43:58.019Z",
       "updatedAt": "2026-08-31T08:43:58.019Z"
     },
@@ -543,6 +592,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:44:27.628Z",
       "updatedAt": "2026-08-31T08:44:27.628Z"
     },
@@ -557,6 +607,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:45:08.697Z",
       "updatedAt": "2026-08-31T08:45:08.697Z"
     },
@@ -571,6 +622,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:45:48.646Z",
       "updatedAt": "2026-08-31T08:45:48.646Z"
     },
@@ -585,6 +637,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:46:30.774Z",
       "updatedAt": "2026-08-31T08:46:30.774Z"
     },
@@ -599,6 +652,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:47:11.189Z",
       "updatedAt": "2026-08-31T08:47:11.189Z"
     },
@@ -613,6 +667,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:47:58.797Z",
       "updatedAt": "2026-08-31T08:47:58.797Z"
     },
@@ -627,6 +682,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:48:35.539Z",
       "updatedAt": "2026-08-31T08:48:35.539Z"
     },
@@ -641,6 +697,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:49:16.321Z",
       "updatedAt": "2026-08-31T08:49:16.321Z"
     },
@@ -655,6 +712,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:50:16.962Z",
       "updatedAt": "2026-08-31T08:50:16.962Z"
     },
@@ -669,6 +727,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:51:36.186Z",
       "updatedAt": "2026-09-11T09:55:19.474Z"
     },
@@ -683,6 +742,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:52:36.131Z",
       "updatedAt": "2026-08-31T08:52:36.131Z"
     },
@@ -697,6 +757,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:53:20.501Z",
       "updatedAt": "2026-10-15T03:15:04.119Z"
     },
@@ -711,6 +772,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:53:49.272Z",
       "updatedAt": "2026-10-15T03:15:09.686Z"
     },
@@ -725,6 +787,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:54:26.098Z",
       "updatedAt": "2026-08-31T08:54:26.098Z"
     },
@@ -739,6 +802,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:55:06.899Z",
       "updatedAt": "2026-08-31T08:55:06.899Z"
     },
@@ -753,6 +817,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:55:39.446Z",
       "updatedAt": "2026-08-31T08:55:39.446Z"
     },
@@ -767,6 +832,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:56:02.561Z",
       "updatedAt": "2026-08-31T08:56:02.561Z"
     },
@@ -781,6 +847,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:56:32.399Z",
       "updatedAt": "2026-08-31T08:56:32.399Z"
     },
@@ -795,6 +862,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:57:27.411Z",
       "updatedAt": "2026-08-31T08:57:27.411Z"
     },
@@ -809,6 +877,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:57:57.363Z",
       "updatedAt": "2026-08-31T08:58:16.135Z"
     },
@@ -823,6 +892,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T08:59:16.044Z",
       "updatedAt": "2026-08-31T08:59:16.044Z"
     },
@@ -837,6 +907,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T09:00:33.483Z",
       "updatedAt": "2026-08-31T09:00:33.483Z"
     },
@@ -851,6 +922,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T09:01:03.381Z",
       "updatedAt": "2026-08-31T09:01:03.381Z"
     },
@@ -865,6 +937,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T09:01:42.937Z",
       "updatedAt": "2026-08-31T09:01:42.937Z"
     },
@@ -879,6 +952,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T09:02:08.173Z",
       "updatedAt": "2026-08-31T09:02:08.173Z"
     },
@@ -893,6 +967,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T09:02:35.793Z",
       "updatedAt": "2026-08-31T09:02:35.793Z"
     },
@@ -907,6 +982,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T09:03:02.527Z",
       "updatedAt": "2026-08-31T09:03:02.527Z"
     },
@@ -921,6 +997,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T09:03:32.699Z",
       "updatedAt": "2026-08-31T09:03:32.699Z"
     },
@@ -935,6 +1012,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T09:04:01.781Z",
       "updatedAt": "2026-08-31T09:04:01.781Z"
     },
@@ -949,6 +1027,7 @@
       "status": "discharged",
       "dischargedAt": "2026-10-01",
       "dischargedMonth": "2026-10",
+      "assessmentHistory": [],
       "createdAt": "2026-08-31T09:04:39.406Z",
       "updatedAt": "2026-10-13T06:22:52.141Z"
     },
@@ -963,6 +1042,7 @@
       "status": "discharged",
       "dischargedAt": "2026-09-22",
       "dischargedMonth": "2026-09",
+      "assessmentHistory": [],
       "createdAt": "2026-09-22T09:03:13.669Z",
       "updatedAt": "2026-09-22T09:12:43.643Z"
     },
@@ -977,6 +1057,7 @@
       "status": "discharged",
       "dischargedAt": "2026-10-01",
       "dischargedMonth": "2026-10",
+      "assessmentHistory": [],
       "createdAt": "2026-09-22T09:05:10.224Z",
       "updatedAt": "2026-10-08T02:53:33.023Z"
     },
@@ -991,6 +1072,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-10-08T05:40:01.694Z",
       "updatedAt": "2026-10-08T05:40:01.694Z"
     },
@@ -1005,6 +1087,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-10-08T08:56:20.328Z",
       "updatedAt": "2026-10-08T08:56:20.328Z"
     },
@@ -1019,6 +1102,7 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
+      "assessmentHistory": [],
       "createdAt": "2026-10-30T06:28:16.458Z",
       "updatedAt": "2026-10-30T06:28:16.458Z"
     }
