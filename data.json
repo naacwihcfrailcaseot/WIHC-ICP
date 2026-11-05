@@ -229,16 +229,27 @@
           "id": "mw3at8p30z2tpi",
           "date": "2023-05-08",
           "previousIcpDate": "2026-10-16",
-          "icpDate": "2026-10-16",
+          "icpDate": "2023-05-08",
           "cognitiveTool": "HKMoCA-5min",
           "cognitiveScore": 9.5,
           "mbiScore": 69,
+          "lawtonScore": null,
+          "notes": "d/c review"
+        },
+        {
+          "id": "mw3av0gvsegonc",
+          "date": "2023-09-19",
+          "previousIcpDate": "2026-10-16",
+          "icpDate": "2026-10-16",
+          "cognitiveTool": "HKMoCA-5min",
+          "cognitiveScore": 8,
+          "mbiScore": 79,
           "lawtonScore": null,
           "notes": ""
         }
       ],
       "createdAt": "2026-08-31T08:12:57.003Z",
-      "updatedAt": "2026-11-05T08:43:23.847Z"
+      "updatedAt": "2026-11-05T08:44:46.495Z"
     },
     {
       "id": "mtgyq9m9nbwajt",
