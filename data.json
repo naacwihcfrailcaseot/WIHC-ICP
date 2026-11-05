@@ -194,9 +194,9 @@
           "id": "mw39d4x698i3s7",
           "date": "2026-09-10",
           "previousIcpDate": "2026-10-30",
-          "icpDate": "2026-10-30",
-          "cognitiveTool": "/",
-          "cognitiveScore": 0,
+          "icpDate": "2026-09-10",
+          "cognitiveTool": "N/A",
+          "cognitiveScore": null,
           "mbiScore": 54,
           "notes": ""
         },
@@ -212,7 +212,7 @@
         }
       ],
       "createdAt": "2026-08-31T08:15:44.864Z",
-      "updatedAt": "2026-11-05T08:02:52.842Z"
+      "updatedAt": "2026-11-05T08:13:57.254Z"
     },
     {
       "id": "mtgytqtqygdr29",
