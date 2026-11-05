@@ -886,19 +886,25 @@
         </div>
         <div class="row2">
           <div class="form-group" id="reviewCogScoreGroup">
-            <label for="reviewCogScore">認知分數 <span id="reviewCogScoreReq">*</span></label>
-            <input type="number" id="reviewCogScore" step="any" placeholder="例如：22" />
+            <label for="reviewCogScore">認知分數（選填）</label>
+            <input type="number" id="reviewCogScore" step="any" placeholder="無則留空" />
           </div>
           <div class="form-group">
-            <label for="reviewMbi">MBI（ADL）分數 *</label>
-            <input type="number" id="reviewMbi" step="any" min="0" max="100" required placeholder="0–100" />
+            <label for="reviewMbi">MBI（ADL）分數（選填）</label>
+            <input type="number" id="reviewMbi" step="any" min="0" max="100" placeholder="無則留空" />
           </div>
         </div>
-        <div class="form-group">
-          <label for="reviewNotes">備註</label>
-          <input type="text" id="reviewNotes" placeholder="選填" />
+        <div class="row2">
+          <div class="form-group">
+            <label for="reviewLawton">Lawton（IADL）分數（選填）</label>
+            <input type="number" id="reviewLawton" step="any" min="0" max="8" placeholder="無則留空" />
+          </div>
+          <div class="form-group">
+            <label for="reviewNotes">備註</label>
+            <input type="text" id="reviewNotes" placeholder="選填" />
+          </div>
         </div>
-        <p style="font-size:0.75rem;color:var(--muted);margin:0.2rem 0 0.5rem;">過往 ICP Date 與分數會保留在歷史紀錄中，可於個案列展開後編輯或刪除。</p>
+        <p style="font-size:0.75rem;color:var(--muted);margin:0.2rem 0 0.5rem;">各項分數均可留空。過往紀錄可於個案列展開後編輯或刪除。</p>
       </form>
       <div class="btn-row">
         <button type="button" class="btn-secondary" onclick="closeReviewModal()">取消</button>
@@ -1047,16 +1053,19 @@
       return arr.map(function (a) {
         if (!a || typeof a !== 'object') return null;
         var tool = String(a.cognitiveTool || a.tool || '').trim();
-        if (!tool) tool = 'other';
-        var mbi = a.mbiScore;
-        if (mbi === undefined || mbi === null || mbi === '') return null;
+        if (!tool) tool = 'N/A';
         var score = a.cognitiveScore;
         var scoreVal = null;
-        if (tool === 'N/A') {
-          scoreVal = null;
-        } else {
-          if (score === undefined || score === null || score === '') return null;
+        if (tool !== 'N/A' && score !== undefined && score !== null && score !== '') {
           scoreVal = Number(score);
+        }
+        var mbiVal = null;
+        if (a.mbiScore !== undefined && a.mbiScore !== null && a.mbiScore !== '') {
+          mbiVal = Number(a.mbiScore);
+        }
+        var lawtonVal = null;
+        if (a.lawtonScore !== undefined && a.lawtonScore !== null && a.lawtonScore !== '') {
+          lawtonVal = Number(a.lawtonScore);
         }
         return {
           id: a.id || uid(),
@@ -1065,7 +1074,8 @@
           icpDate: a.icpDate || a.date || '',
           cognitiveTool: tool,
           cognitiveScore: scoreVal,
-          mbiScore: Number(mbi),
+          mbiScore: mbiVal,
+          lawtonScore: lawtonVal,
           notes: String(a.notes || '').trim()
         };
       }).filter(function (a) { return a && a.date; })
@@ -1073,6 +1083,16 @@
           if (a.date !== b.date) return a.date < b.date ? -1 : 1;
           return 0;
         });
+    }
+
+    function parseOptionalNumber(v) {
+      if (v === undefined || v === null || String(v).trim() === '') return null;
+      var n = Number(v);
+      return isNaN(n) ? null : n;
+    }
+
+    function formatScoreCell(v) {
+      return (v === null || v === undefined || v === '') ? '—' : v;
     }
 
     function isPresetCogTool(tool) {
@@ -1083,15 +1103,12 @@
       var sel = document.getElementById('reviewCogTool');
       var otherGroup = document.getElementById('reviewOtherToolGroup');
       var scoreInput = document.getElementById('reviewCogScore');
-      var scoreReq = document.getElementById('reviewCogScoreReq');
       if (!sel) return;
       if (otherGroup) otherGroup.style.display = (sel.value === 'other') ? '' : 'none';
       if (scoreInput) {
         var na = sel.value === 'N/A';
         scoreInput.disabled = na;
-        scoreInput.required = !na;
         if (na) scoreInput.value = '';
-        if (scoreReq) scoreReq.style.display = na ? 'none' : '';
       }
     }
 
@@ -1478,7 +1495,8 @@ function addYears(dateStr, years) {
         document.getElementById('reviewModalHint').textContent =
           '修改此筆歷史紀錄。不會自動改動個案現時 ICP Date（目前：' + formatDate(c.icpDate) + '）。';
         document.getElementById('reviewDate').value = a.date || today;
-        document.getElementById('reviewMbi').value = a.mbiScore;
+        document.getElementById('reviewMbi').value = (a.mbiScore === null || a.mbiScore === undefined) ? '' : a.mbiScore;
+        document.getElementById('reviewLawton').value = (a.lawtonScore === null || a.lawtonScore === undefined) ? '' : a.lawtonScore;
         document.getElementById('reviewNotes').value = a.notes || '';
         if (a.cognitiveTool === 'N/A') {
           document.getElementById('reviewCogTool').value = 'N/A';
@@ -1503,6 +1521,7 @@ function addYears(dateStr, years) {
         document.getElementById('reviewOtherTool').value = '';
         document.getElementById('reviewCogScore').value = '';
         document.getElementById('reviewMbi').value = '';
+        document.getElementById('reviewLawton').value = '';
         document.getElementById('reviewNotes').value = '';
         document.getElementById('btnSaveReview').textContent = '儲存覆核紀錄';
       }
@@ -1531,11 +1550,12 @@ function addYears(dateStr, years) {
       if (!c) return;
       var date = document.getElementById('reviewDate').value;
       var toolName = resolveReviewToolName();
-      var cogScore = document.getElementById('reviewCogScore').value;
-      var mbi = document.getElementById('reviewMbi').value;
+      var cogScore = parseOptionalNumber(document.getElementById('reviewCogScore').value);
+      var mbi = parseOptionalNumber(document.getElementById('reviewMbi').value);
+      var lawton = parseOptionalNumber(document.getElementById('reviewLawton').value);
       var notes = document.getElementById('reviewNotes').value.trim();
-      if (!date || mbi === '') {
-        toast('請填寫評估日期及 MBI');
+      if (!date) {
+        toast('請填寫評估日期');
         return;
       }
       if (!toolName) {
@@ -1544,10 +1564,7 @@ function addYears(dateStr, years) {
           : '請選擇認知評估工具');
         return;
       }
-      if (toolName !== 'N/A' && cogScore === '') {
-        toast('請填寫認知分數（或選擇 N/A）');
-        return;
-      }
+      if (toolName === 'N/A') cogScore = null;
       if (!Array.isArray(c.assessmentHistory)) c.assessmentHistory = [];
 
       if (assessId) {
@@ -1560,8 +1577,9 @@ function addYears(dateStr, years) {
           previousIcpDate: old.previousIcpDate || null,
           icpDate: date,
           cognitiveTool: toolName,
-          cognitiveScore: (toolName === 'N/A') ? null : Number(cogScore),
-          mbiScore: Number(mbi),
+          cognitiveScore: cogScore,
+          mbiScore: mbi,
+          lawtonScore: lawton,
           notes: notes
         };
         c.assessmentHistory = normalizeAssessments(c.assessmentHistory);
@@ -1584,8 +1602,9 @@ function addYears(dateStr, years) {
         previousIcpDate: prevIcp || null,
         icpDate: shouldUpdateIcp ? date : prevIcp,
         cognitiveTool: toolName,
-        cognitiveScore: (toolName === 'N/A') ? null : Number(cogScore),
-        mbiScore: Number(mbi),
+        cognitiveScore: cogScore,
+        mbiScore: mbi,
+        lawtonScore: lawton,
         notes: notes
       });
       c.assessmentHistory = normalizeAssessments(c.assessmentHistory);
@@ -2008,8 +2027,9 @@ function addYears(dateStr, years) {
         return '<tr>' +
           '<td>' + formatDate(a.date) + '</td>' +
           '<td>' + escapeHtml(a.cognitiveTool) + '</td>' +
-          '<td>' + (a.cognitiveTool === 'N/A' || a.cognitiveScore === null || a.cognitiveScore === undefined ? '—' : a.cognitiveScore) + '</td>' +
-          '<td>' + a.mbiScore + '</td>' +
+          '<td>' + formatScoreCell(a.cognitiveScore) + '</td>' +
+          '<td>' + formatScoreCell(a.mbiScore) + '</td>' +
+          '<td>' + formatScoreCell(a.lawtonScore) + '</td>' +
           '<td>' + escapeHtml(a.notes || '—') + '</td>' +
           '<td class="no-print" style="white-space:nowrap;">' +
             '<button type="button" class="btn-secondary btn-sm" data-act="edit-assess" data-id="' +
@@ -2024,20 +2044,29 @@ function addYears(dateStr, years) {
         '</div>';
       var tableHtml = hist.length
         ? addBtn + '<table class="assess-table"><thead><tr>' +
-          '<th>評估日期</th><th>認知工具</th><th>認知分數</th><th>MBI</th><th>備註</th><th class="no-print">操作</th>' +
+          '<th>評估日期</th><th>認知工具</th><th>認知分數</th><th>MBI</th><th>Lawton</th><th>備註</th><th class="no-print">操作</th>' +
           '</tr></thead><tbody>' + tableRows + '</tbody></table>'
         : addBtn + '<div class="detail-empty">尚未有評估紀錄。可按「覆核」或「＋ 新增評估紀錄」加入分數。</div>';
 
-      // chart containers: one MBI + one per cognitive tool present
+      // chart containers: MBI, Lawton, and one cognitive chart per tool (skip N/A)
       var toolsUsed = [];
       hist.forEach(function (a) {
         if (!a.cognitiveTool || a.cognitiveTool === 'N/A') return;
+        if (a.cognitiveScore === null || a.cognitiveScore === undefined) return;
         if (toolsUsed.indexOf(a.cognitiveTool) === -1) toolsUsed.push(a.cognitiveTool);
       });
+      var hasMbi = hist.some(function (a) { return a.mbiScore !== null && a.mbiScore !== undefined; });
+      var hasLawton = hist.some(function (a) { return a.lawtonScore !== null && a.lawtonScore !== undefined; });
       var chartHtml = '';
       if (hist.length) {
-        chartHtml += '<div class="detail-chart-box"><h5>MBI（ADL）趨勢</h5><div class="chart-h"><canvas id="chart-mbi-' +
-          escapeHtml(c.id) + '"></canvas></div></div>';
+        if (hasMbi) {
+          chartHtml += '<div class="detail-chart-box"><h5>MBI（ADL）趨勢</h5><div class="chart-h"><canvas id="chart-mbi-' +
+            escapeHtml(c.id) + '"></canvas></div></div>';
+        }
+        if (hasLawton) {
+          chartHtml += '<div class="detail-chart-box"><h5>Lawton（IADL）趨勢</h5><div class="chart-h"><canvas id="chart-lawton-' +
+            escapeHtml(c.id) + '"></canvas></div></div>';
+        }
         toolsUsed.forEach(function (tool) {
           var safe = String(tool).replace(/[^a-zA-Z0-9_-]/g, '_');
           chartHtml += '<div class="detail-chart-box"><h5>認知分數趨勢 — ' + escapeHtml(tool) +
@@ -2057,18 +2086,17 @@ function addYears(dateStr, years) {
       var hist = normalizeAssessments(c.assessmentHistory || []);
       if (!hist.length) return;
 
-      // MBI chart (all records chronologically)
-      var mbiLabels = hist.map(function (a) { return a.date; });
-      var mbiData = hist.map(function (a) { return a.mbiScore; });
+      // MBI chart (only dates with MBI score)
+      var mbiPts = hist.filter(function (a) { return a.mbiScore !== null && a.mbiScore !== undefined; });
       var mbiCanvas = document.getElementById('chart-mbi-' + c.id);
-      if (mbiCanvas) {
+      if (mbiCanvas && mbiPts.length) {
         detailCharts['mbi-' + c.id] = new Chart(mbiCanvas, {
           type: 'line',
           data: {
-            labels: mbiLabels,
+            labels: mbiPts.map(function (a) { return a.date; }),
             datasets: [{
               label: 'MBI',
-              data: mbiData,
+              data: mbiPts.map(function (a) { return a.mbiScore; }),
               borderColor: COLORS.line[0],
               backgroundColor: 'rgba(27,94,69,0.12)',
               tension: 0.25,
@@ -2077,6 +2105,28 @@ function addYears(dateStr, years) {
             }]
           },
           options: lineChartOptions('MBI')
+        });
+      }
+
+      // Lawton (IADL) chart
+      var lawtonPts = hist.filter(function (a) { return a.lawtonScore !== null && a.lawtonScore !== undefined; });
+      var lawtonCanvas = document.getElementById('chart-lawton-' + c.id);
+      if (lawtonCanvas && lawtonPts.length) {
+        detailCharts['lawton-' + c.id] = new Chart(lawtonCanvas, {
+          type: 'line',
+          data: {
+            labels: lawtonPts.map(function (a) { return a.date; }),
+            datasets: [{
+              label: 'Lawton',
+              data: lawtonPts.map(function (a) { return a.lawtonScore; }),
+              borderColor: COLORS.line[2],
+              backgroundColor: 'rgba(192,86,33,0.12)',
+              tension: 0.25,
+              fill: true,
+              pointRadius: 3
+            }]
+          },
+          options: lineChartOptions('Lawton')
         });
       }
 
