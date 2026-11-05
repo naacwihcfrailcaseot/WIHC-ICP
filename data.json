@@ -62,9 +62,20 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
-      "assessmentHistory": [],
+      "assessmentHistory": [
+        {
+          "id": "mw30j16azkx4iq",
+          "date": "2023-04-06",
+          "previousIcpDate": "2026-03-18",
+          "icpDate": "2026-03-18",
+          "cognitiveTool": "HKMoCA-full",
+          "cognitiveScore": 26,
+          "mbiScore": 85,
+          "notes": ""
+        }
+      ],
       "createdAt": "2026-08-31T08:12:04.303Z",
-      "updatedAt": "2026-08-31T08:12:04.303Z"
+      "updatedAt": "2026-11-05T03:55:31.378Z"
     },
     {
       "id": "mtgynv3fm4n2mr",
