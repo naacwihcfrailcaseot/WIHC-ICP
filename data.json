@@ -26,9 +26,20 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
-      "assessmentHistory": [],
+      "assessmentHistory": [
+        {
+          "id": "mw309t15cam3oq",
+          "date": "2026-03-23",
+          "previousIcpDate": "2026-03-23",
+          "icpDate": "2026-03-23",
+          "cognitiveTool": "HKMoCA-5min",
+          "cognitiveScore": 22,
+          "mbiScore": 87,
+          "notes": ""
+        }
+      ],
       "createdAt": "2026-08-31T08:08:41.226Z",
-      "updatedAt": "2026-08-31T08:08:41.226Z"
+      "updatedAt": "2026-11-05T03:48:20.921Z"
     },
     {
       "id": "mtgymqfjvxbvgt",
