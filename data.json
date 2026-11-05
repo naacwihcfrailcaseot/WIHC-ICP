@@ -226,11 +226,11 @@
           "id": "mw39vzkfojerpr",
           "date": "2024-10-02",
           "previousIcpDate": "2026-10-30",
-          "icpDate": "2026-10-30",
+          "icpDate": "2024-10-02",
           "cognitiveTool": "N/A",
           "cognitiveScore": null,
           "mbiScore": 95,
-          "lawtonScore": null,
+          "lawtonScore": 39,
           "notes": ""
         },
         {
@@ -268,7 +268,7 @@
         }
       ],
       "createdAt": "2026-08-31T08:15:44.864Z",
-      "updatedAt": "2026-11-05T08:29:18.038Z"
+      "updatedAt": "2026-11-05T08:30:54.691Z"
     },
     {
       "id": "mtgytqtqygdr29",
