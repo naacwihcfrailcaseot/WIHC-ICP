@@ -35,6 +35,7 @@
           "cognitiveTool": "HKMoCA-5min",
           "cognitiveScore": 25,
           "mbiScore": 89,
+          "lawtonScore": null,
           "notes": ""
         },
         {
@@ -45,6 +46,7 @@
           "cognitiveTool": "HKMoCA-5min",
           "cognitiveScore": 22,
           "mbiScore": 87,
+          "lawtonScore": null,
           "notes": ""
         }
       ],
@@ -71,6 +73,7 @@
           "cognitiveTool": "HKMoCA-full",
           "cognitiveScore": 26,
           "mbiScore": 85,
+          "lawtonScore": null,
           "notes": ""
         },
         {
@@ -81,6 +84,7 @@
           "cognitiveTool": "HKMoCA-full",
           "cognitiveScore": 27,
           "mbiScore": 84,
+          "lawtonScore": null,
           "notes": ""
         },
         {
@@ -91,6 +95,7 @@
           "cognitiveTool": "HKBC",
           "cognitiveScore": 29,
           "mbiScore": 83,
+          "lawtonScore": null,
           "notes": ""
         },
         {
@@ -101,6 +106,7 @@
           "cognitiveTool": "HKBC",
           "cognitiveScore": 28,
           "mbiScore": 86,
+          "lawtonScore": null,
           "notes": ""
         }
       ],
@@ -142,6 +148,7 @@
           "cognitiveTool": "HKBC",
           "cognitiveScore": 23,
           "mbiScore": 98,
+          "lawtonScore": null,
           "notes": ""
         },
         {
@@ -152,6 +159,7 @@
           "cognitiveTool": "AMT",
           "cognitiveScore": 10,
           "mbiScore": 98,
+          "lawtonScore": null,
           "notes": ""
         },
         {
@@ -162,6 +170,7 @@
           "cognitiveTool": "HKMoCA-full",
           "cognitiveScore": 22,
           "mbiScore": 90,
+          "lawtonScore": null,
           "notes": ""
         },
         {
@@ -172,6 +181,7 @@
           "cognitiveTool": "HKBC",
           "cognitiveScore": 24,
           "mbiScore": 90,
+          "lawtonScore": null,
           "notes": ""
         }
       ],
@@ -191,6 +201,17 @@
       "dischargedMonth": null,
       "assessmentHistory": [
         {
+          "id": "mw3aa35ej1bwmd",
+          "date": "2023-10-06",
+          "previousIcpDate": "2026-10-30",
+          "icpDate": "2026-10-30",
+          "cognitiveTool": "N/A",
+          "cognitiveScore": null,
+          "mbiScore": 92,
+          "lawtonScore": 45,
+          "notes": ""
+        },
+        {
           "id": "mw39vzkfojerpr",
           "date": "2024-10-02",
           "previousIcpDate": "2026-10-30",
@@ -198,6 +219,7 @@
           "cognitiveTool": "N/A",
           "cognitiveScore": null,
           "mbiScore": 95,
+          "lawtonScore": null,
           "notes": ""
         },
         {
@@ -208,6 +230,7 @@
           "cognitiveTool": "AMT",
           "cognitiveScore": 10,
           "mbiScore": 95,
+          "lawtonScore": null,
           "notes": ""
         },
         {
@@ -218,6 +241,7 @@
           "cognitiveTool": "N/A",
           "cognitiveScore": null,
           "mbiScore": 54,
+          "lawtonScore": null,
           "notes": ""
         },
         {
@@ -228,11 +252,12 @@
           "cognitiveTool": "AMT",
           "cognitiveScore": 10,
           "mbiScore": 68,
+          "lawtonScore": null,
           "notes": ""
         }
       ],
       "createdAt": "2026-08-31T08:15:44.864Z",
-      "updatedAt": "2026-11-05T08:17:32.367Z"
+      "updatedAt": "2026-11-05T08:28:30.194Z"
     },
     {
       "id": "mtgytqtqygdr29",
@@ -254,6 +279,7 @@
           "cognitiveTool": "HKMoCA-5min",
           "cognitiveScore": 15,
           "mbiScore": 78,
+          "lawtonScore": null,
           "notes": ""
         }
       ],
@@ -445,6 +471,7 @@
           "cognitiveTool": "HKMoCA-5min",
           "cognitiveScore": 0,
           "mbiScore": 97,
+          "lawtonScore": null,
           "notes": ""
         },
         {
@@ -455,6 +482,7 @@
           "cognitiveTool": "HKMoCA-5min",
           "cognitiveScore": 22,
           "mbiScore": 74,
+          "lawtonScore": null,
           "notes": ""
         }
       ],
