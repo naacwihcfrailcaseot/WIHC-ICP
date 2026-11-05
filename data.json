@@ -98,12 +98,12 @@
           "id": "mw3anbhnrkwo66",
           "date": "2023-02-03",
           "previousIcpDate": "2026-03-23",
-          "icpDate": "2026-03-23",
+          "icpDate": "2023-02-03",
           "cognitiveTool": "HKMoCA-5min",
           "cognitiveScore": 25,
           "mbiScore": 87,
           "lawtonScore": 35,
-          "notes": ""
+          "notes": "lifestyle reactivation intake assessment"
         },
         {
           "id": "mw30dztospv017",
@@ -114,6 +114,17 @@
           "cognitiveScore": 25,
           "mbiScore": 89,
           "lawtonScore": null,
+          "notes": ""
+        },
+        {
+          "id": "mw3apjbg82o5g9",
+          "date": "2024-04-05",
+          "previousIcpDate": "2026-03-23",
+          "icpDate": "2026-03-23",
+          "cognitiveTool": "HKMoCA-5min",
+          "cognitiveScore": 25,
+          "mbiScore": 89,
+          "lawtonScore": 33,
           "notes": ""
         },
         {
@@ -129,7 +140,7 @@
         }
       ],
       "createdAt": "2026-08-31T08:08:41.226Z",
-      "updatedAt": "2026-11-05T08:38:47.531Z"
+      "updatedAt": "2026-11-05T08:40:30.988Z"
     },
     {
       "id": "mtgymqfjvxbvgt",
