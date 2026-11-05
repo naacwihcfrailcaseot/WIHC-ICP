@@ -189,9 +189,20 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
-      "assessmentHistory": [],
+      "assessmentHistory": [
+        {
+          "id": "mw39bg5r36kipw",
+          "date": "2026-10-30",
+          "previousIcpDate": "2026-10-30",
+          "icpDate": "2026-10-30",
+          "cognitiveTool": "AMT",
+          "cognitiveScore": 10,
+          "mbiScore": 68,
+          "notes": ""
+        }
+      ],
       "createdAt": "2026-08-31T08:15:44.864Z",
-      "updatedAt": "2026-10-31T08:45:25.705Z"
+      "updatedAt": "2026-11-05T08:01:34.095Z"
     },
     {
       "id": "mtgytqtqygdr29",
