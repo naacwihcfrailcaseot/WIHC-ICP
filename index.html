@@ -875,6 +875,7 @@
               <option value="HKBC">HKBC</option>
               <option value="AMT">AMT</option>
               <option value="CDR">CDR</option>
+              <option value="N/A">N/A（今次無認知評估）</option>
               <option value="other">other（自訂名稱）</option>
             </select>
           </div>
@@ -884,9 +885,9 @@
           </div>
         </div>
         <div class="row2">
-          <div class="form-group">
-            <label for="reviewCogScore">認知分數 *</label>
-            <input type="number" id="reviewCogScore" step="any" required placeholder="例如：22" />
+          <div class="form-group" id="reviewCogScoreGroup">
+            <label for="reviewCogScore">認知分數 <span id="reviewCogScoreReq">*</span></label>
+            <input type="number" id="reviewCogScore" step="any" placeholder="例如：22" />
           </div>
           <div class="form-group">
             <label for="reviewMbi">MBI（ADL）分數 *</label>
@@ -960,7 +961,7 @@
       line: ['#1B5E45', '#2F6F4E', '#C05621', '#2B6CB0', '#805AD5', '#C53030']
     };
 
-    var COG_TOOLS = ['HKMoCA-5min', 'HKMoCA-full', 'HKBC', 'AMT', 'CDR', 'other'];
+    var COG_TOOLS = ['HKMoCA-5min', 'HKMoCA-full', 'HKBC', 'AMT', 'CDR', 'N/A', 'other'];
 
 
     function getToken() { return (localStorage.getItem(TOKEN_KEY) || '').trim(); }
@@ -1047,18 +1048,23 @@
         if (!a || typeof a !== 'object') return null;
         var tool = String(a.cognitiveTool || a.tool || '').trim();
         if (!tool) tool = 'other';
-        // keep custom tool names (do not force unknown tools back to "other")
-        var score = a.cognitiveScore;
-        if (score === undefined || score === null || score === '') return null;
         var mbi = a.mbiScore;
         if (mbi === undefined || mbi === null || mbi === '') return null;
+        var score = a.cognitiveScore;
+        var scoreVal = null;
+        if (tool === 'N/A') {
+          scoreVal = null;
+        } else {
+          if (score === undefined || score === null || score === '') return null;
+          scoreVal = Number(score);
+        }
         return {
           id: a.id || uid(),
           date: a.date || a.assessmentDate || '',
           previousIcpDate: a.previousIcpDate || null,
           icpDate: a.icpDate || a.date || '',
           cognitiveTool: tool,
-          cognitiveScore: Number(score),
+          cognitiveScore: scoreVal,
           mbiScore: Number(mbi),
           notes: String(a.notes || '').trim()
         };
@@ -1075,9 +1081,18 @@
 
     function syncOtherToolField() {
       var sel = document.getElementById('reviewCogTool');
-      var group = document.getElementById('reviewOtherToolGroup');
-      if (!sel || !group) return;
-      group.style.display = (sel.value === 'other') ? '' : 'none';
+      var otherGroup = document.getElementById('reviewOtherToolGroup');
+      var scoreInput = document.getElementById('reviewCogScore');
+      var scoreReq = document.getElementById('reviewCogScoreReq');
+      if (!sel) return;
+      if (otherGroup) otherGroup.style.display = (sel.value === 'other') ? '' : 'none';
+      if (scoreInput) {
+        var na = sel.value === 'N/A';
+        scoreInput.disabled = na;
+        scoreInput.required = !na;
+        if (na) scoreInput.value = '';
+        if (scoreReq) scoreReq.style.display = na ? 'none' : '';
+      }
     }
 
 
@@ -1463,10 +1478,12 @@ function addYears(dateStr, years) {
         document.getElementById('reviewModalHint').textContent =
           '修改此筆歷史紀錄。不會自動改動個案現時 ICP Date（目前：' + formatDate(c.icpDate) + '）。';
         document.getElementById('reviewDate').value = a.date || today;
-        document.getElementById('reviewCogScore').value = a.cognitiveScore;
         document.getElementById('reviewMbi').value = a.mbiScore;
         document.getElementById('reviewNotes').value = a.notes || '';
-        if (isPresetCogTool(a.cognitiveTool) && a.cognitiveTool !== 'other') {
+        if (a.cognitiveTool === 'N/A') {
+          document.getElementById('reviewCogTool').value = 'N/A';
+          document.getElementById('reviewOtherTool').value = '';
+        } else if (isPresetCogTool(a.cognitiveTool) && a.cognitiveTool !== 'other') {
           document.getElementById('reviewCogTool').value = a.cognitiveTool;
           document.getElementById('reviewOtherTool').value = '';
         } else {
@@ -1474,6 +1491,8 @@ function addYears(dateStr, years) {
           document.getElementById('reviewOtherTool').value =
             (a.cognitiveTool === 'other') ? '' : (a.cognitiveTool || '');
         }
+        document.getElementById('reviewCogScore').value =
+          (a.cognitiveScore === null || a.cognitiveScore === undefined) ? '' : a.cognitiveScore;
         document.getElementById('btnSaveReview').textContent = '更新紀錄';
       } else {
         document.getElementById('reviewModalTitle').textContent = 'ICP 覆核及評估 — ' + c.name;
@@ -1515,12 +1534,18 @@ function addYears(dateStr, years) {
       var cogScore = document.getElementById('reviewCogScore').value;
       var mbi = document.getElementById('reviewMbi').value;
       var notes = document.getElementById('reviewNotes').value.trim();
-      if (!date || cogScore === '' || mbi === '') {
-        toast('請填寫評估日期、認知分數及 MBI');
+      if (!date || mbi === '') {
+        toast('請填寫評估日期及 MBI');
         return;
       }
       if (!toolName) {
-        toast('請輸入自訂認知評估工具名稱');
+        toast(document.getElementById('reviewCogTool').value === 'other'
+          ? '請輸入自訂認知評估工具名稱'
+          : '請選擇認知評估工具');
+        return;
+      }
+      if (toolName !== 'N/A' && cogScore === '') {
+        toast('請填寫認知分數（或選擇 N/A）');
         return;
       }
       if (!Array.isArray(c.assessmentHistory)) c.assessmentHistory = [];
@@ -1535,7 +1560,7 @@ function addYears(dateStr, years) {
           previousIcpDate: old.previousIcpDate || null,
           icpDate: date,
           cognitiveTool: toolName,
-          cognitiveScore: Number(cogScore),
+          cognitiveScore: (toolName === 'N/A') ? null : Number(cogScore),
           mbiScore: Number(mbi),
           notes: notes
         };
@@ -1559,7 +1584,7 @@ function addYears(dateStr, years) {
         previousIcpDate: prevIcp || null,
         icpDate: shouldUpdateIcp ? date : prevIcp,
         cognitiveTool: toolName,
-        cognitiveScore: Number(cogScore),
+        cognitiveScore: (toolName === 'N/A') ? null : Number(cogScore),
         mbiScore: Number(mbi),
         notes: notes
       });
@@ -1983,7 +2008,7 @@ function addYears(dateStr, years) {
         return '<tr>' +
           '<td>' + formatDate(a.date) + '</td>' +
           '<td>' + escapeHtml(a.cognitiveTool) + '</td>' +
-          '<td>' + a.cognitiveScore + '</td>' +
+          '<td>' + (a.cognitiveTool === 'N/A' || a.cognitiveScore === null || a.cognitiveScore === undefined ? '—' : a.cognitiveScore) + '</td>' +
           '<td>' + a.mbiScore + '</td>' +
           '<td>' + escapeHtml(a.notes || '—') + '</td>' +
           '<td class="no-print" style="white-space:nowrap;">' +
@@ -2006,6 +2031,7 @@ function addYears(dateStr, years) {
       // chart containers: one MBI + one per cognitive tool present
       var toolsUsed = [];
       hist.forEach(function (a) {
+        if (!a.cognitiveTool || a.cognitiveTool === 'N/A') return;
         if (toolsUsed.indexOf(a.cognitiveTool) === -1) toolsUsed.push(a.cognitiveTool);
       });
       var chartHtml = '';
@@ -2057,6 +2083,8 @@ function addYears(dateStr, years) {
       // Cognitive: separate chart per tool
       var byTool = {};
       hist.forEach(function (a) {
+        if (!a.cognitiveTool || a.cognitiveTool === 'N/A') return;
+        if (a.cognitiveScore === null || a.cognitiveScore === undefined) return;
         if (!byTool[a.cognitiveTool]) byTool[a.cognitiveTool] = [];
         byTool[a.cognitiveTool].push(a);
       });
