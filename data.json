@@ -224,9 +224,21 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
-      "assessmentHistory": [],
+      "assessmentHistory": [
+        {
+          "id": "mw3at8p30z2tpi",
+          "date": "2023-05-08",
+          "previousIcpDate": "2026-10-16",
+          "icpDate": "2026-10-16",
+          "cognitiveTool": "HKMoCA-5min",
+          "cognitiveScore": 9.5,
+          "mbiScore": 69,
+          "lawtonScore": null,
+          "notes": ""
+        }
+      ],
       "createdAt": "2026-08-31T08:12:57.003Z",
-      "updatedAt": "2026-10-16T05:16:48.725Z"
+      "updatedAt": "2026-11-05T08:43:23.847Z"
     },
     {
       "id": "mtgyq9m9nbwajt",
