@@ -44,10 +44,21 @@
           "mbiScore": 49,
           "lawtonScore": null,
           "notes": ""
+        },
+        {
+          "id": "mw3ajxufzog5ob",
+          "date": "2026-09-11",
+          "previousIcpDate": "2026-09-11",
+          "icpDate": "2026-09-11",
+          "cognitiveTool": "N/A",
+          "cognitiveScore": null,
+          "mbiScore": 41,
+          "lawtonScore": null,
+          "notes": ""
         }
       ],
       "createdAt": "2026-08-31T08:01:19.299Z",
-      "updatedAt": "2026-11-05T08:35:44.195Z"
+      "updatedAt": "2026-11-05T08:36:09.879Z"
     },
     {
       "id": "mtgyidqikovnnh",
@@ -61,6 +72,17 @@
       "dischargedAt": null,
       "dischargedMonth": null,
       "assessmentHistory": [
+        {
+          "id": "mw3al8pf2lfkef",
+          "date": "2021-12-22",
+          "previousIcpDate": "2026-03-23",
+          "icpDate": "2026-03-23",
+          "cognitiveTool": "HKMoCA-5min",
+          "cognitiveScore": 27,
+          "mbiScore": 92,
+          "lawtonScore": null,
+          "notes": ""
+        },
         {
           "id": "mw30dztospv017",
           "date": "2024-04-05",
@@ -85,7 +107,7 @@
         }
       ],
       "createdAt": "2026-08-31T08:08:41.226Z",
-      "updatedAt": "2026-11-05T03:51:36.348Z"
+      "updatedAt": "2026-11-05T08:37:10.611Z"
     },
     {
       "id": "mtgymqfjvxbvgt",
