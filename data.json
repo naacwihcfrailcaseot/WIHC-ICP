@@ -268,10 +268,21 @@
           "mbiScore": 77,
           "lawtonScore": null,
           "notes": ""
+        },
+        {
+          "id": "mw3axpl3mt1ypb",
+          "date": "2025-11-05",
+          "previousIcpDate": "2026-10-16",
+          "icpDate": "2026-10-16",
+          "cognitiveTool": "HKBC",
+          "cognitiveScore": 7,
+          "mbiScore": 62,
+          "lawtonScore": null,
+          "notes": ""
         }
       ],
       "createdAt": "2026-08-31T08:12:57.003Z",
-      "updatedAt": "2026-11-05T08:45:49.182Z"
+      "updatedAt": "2026-11-05T08:46:52.359Z"
     },
     {
       "id": "mtgyq9m9nbwajt",
