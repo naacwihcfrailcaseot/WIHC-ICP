@@ -1341,14 +1341,9 @@ function addYears(dateStr, years) {
       return d.toISOString().slice(0, 10);
     }
     function nextReviewDue(icpDate) { return addYears(icpDate, 1); }
-    function caseIcpDate(c) {
-      if (currentView === 'pt') return (c && c.ptIcpDate) || '';
-      return (c && c.icpDate) || '';
-    }
-
     function getReviewStatus(c) {
       if (!isActive(c)) return 'discharged';
-      var icp = caseIcpDate(c);
+      var icp = c.icpDate;
       if (!icp) return 'ok';
       var due = nextReviewDue(icp);
       var windowStart = addMonths(due, -1);
@@ -1412,16 +1407,11 @@ function addYears(dateStr, years) {
       var name = document.getElementById('caseName').value.trim();
       var admissionDate = document.getElementById('admissionDate').value;
       var icpDate = document.getElementById('icpDate').value;
-      var ptIcpDate = document.getElementById('ptIcpDate').value;
       var cognitive = document.getElementById('cognitive').value;
       var otTraining = document.getElementById('otTraining').value;
       var gerontech = document.getElementById('gerontech').value;
-      if (!name || !admissionDate) {
-        toast('請填寫姓名及入會日期');
-        return;
-      }
-      if (currentView === 'ot' && !icpDate) {
-        toast('請填寫 OT ICP Date');
+      if (!name || !admissionDate || !icpDate) {
+        toast('請填寫所有必填欄位');
         return;
       }
       if (editId) {
@@ -1433,15 +1423,9 @@ function addYears(dateStr, years) {
           toast('退會個案請填寫退會年月');
           return;
         }
-        var prev = cases[idx];
-        cases[idx] = Object.assign({}, prev, {
-          name: name,
-          admissionDate: admissionDate,
-          icpDate: currentView === 'ot' ? icpDate : (prev.icpDate || icpDate || admissionDate),
-          ptIcpDate: currentView === 'pt' ? ptIcpDate : (prev.ptIcpDate || ptIcpDate || ''),
-          cognitive: currentView === 'ot' ? cognitive : (prev.cognitive || 'Normal'),
-          otTraining: currentView === 'ot' ? otTraining : (prev.otTraining || 'No'),
-          gerontech: currentView === 'ot' ? gerontech : (prev.gerontech || 'No'),
+        cases[idx] = Object.assign({}, cases[idx], {
+          name: name, admissionDate: admissionDate, icpDate: icpDate,
+          cognitive: cognitive, otTraining: otTraining, gerontech: gerontech,
           status: isDisc ? 'discharged' : 'active',
           dischargedMonth: isDisc ? dMonth : null,
           dischargedAt: isDisc ? (dMonth + '-01') : null,
@@ -1455,12 +1439,8 @@ function addYears(dateStr, years) {
           return;
         }
         cases.push({
-          id: uid(), name: name, admissionDate: admissionDate,
-          icpDate: icpDate || admissionDate,
-          ptIcpDate: ptIcpDate || '',
-          cognitive: cognitive || 'Normal',
-          otTraining: otTraining || 'No',
-          gerontech: gerontech || 'No',
+          id: uid(), name: name, admissionDate: admissionDate, icpDate: icpDate,
+          cognitive: cognitive, otTraining: otTraining, gerontech: gerontech,
           status: 'active',
           assessmentHistory: [],
           createdAt: new Date().toISOString(),
@@ -1479,8 +1459,7 @@ function addYears(dateStr, years) {
       document.getElementById('editId').value = c.id;
       document.getElementById('caseName').value = c.name;
       document.getElementById('admissionDate').value = c.admissionDate;
-      document.getElementById('icpDate').value = c.icpDate || '';
-      document.getElementById('ptIcpDate').value = c.ptIcpDate || '';
+      document.getElementById('icpDate').value = c.icpDate;
       document.getElementById('cognitive').value = c.cognitive;
       document.getElementById('otTraining').value = c.otTraining;
       document.getElementById('gerontech').value = c.gerontech;
@@ -1500,29 +1479,9 @@ function addYears(dateStr, years) {
     }
 
     function askReview(id) {
-      if (currentView === 'pt') {
-        openPtReviewModal(id);
-        return;
-      }
       openAssessmentModal(id, null);
     }
 
-    function openPtReviewModal(id) {
-      var c = cases.find(function (x) { return x.id === id; });
-      if (!c) return;
-      var today = new Date().toISOString().slice(0, 10);
-      openModal(
-        'PT ICP 覆核 — ' + c.name,
-        '確定完成物理治療 ICP 覆核？\n完成日期將設為今日（' + today + '），並作為下次覆核計算基準。\n（評估工具日後可再增加）',
-        async function () {
-          c.ptIcpDate = today;
-          c.updatedAt = new Date().toISOString();
-          await persist('PT 覆核: ' + c.name);
-          refreshAll();
-          toast('已更新「' + c.name + '」PT ICP Date');
-        }
-      );
-    }
 
 
     /** openAssessmentModal(caseId, assessId|null) — null = new ICP review */
@@ -1740,11 +1699,9 @@ function addYears(dateStr, years) {
       renderStats();
       renderAlerts();
       renderTable();
-      if (currentView === 'ot') {
-        renderCharts();
-        renderGerontech();
-      }
+      renderCharts();
       renderReviewByMonth();
+      renderGerontech();
     }
 
     function renderStats() {
@@ -1768,8 +1725,8 @@ function addYears(dateStr, years) {
 
     function sortByReviewDueAsc(list) {
       return list.slice().sort(function (a, b) {
-        var da = caseIcpDate(a) ? (nextReviewDue(caseIcpDate(a)) || '') : '';
-        var db = caseIcpDate(b) ? (nextReviewDue(caseIcpDate(b)) || '') : '';
+        var da = a.icpDate ? (nextReviewDue(a.icpDate) || '') : '';
+        var db = b.icpDate ? (nextReviewDue(b.icpDate) || '') : '';
         if (da !== db) return da < db ? -1 : 1;
         return (a.name || '').localeCompare(b.name || '', 'zh-HK');
       });
@@ -1792,14 +1749,14 @@ function addYears(dateStr, years) {
       if (overdueList.length) {
         html += '<strong>⚠ 已過期未覆核（' + overdueList.length + '）</strong><ul>';
         overdueList.forEach(function (c) {
-          html += '<li>' + escapeHtml(c.name) + ' — 期限：' + formatDate(nextReviewDue(caseIcpDate(c))) + '</li>';
+          html += '<li>' + escapeHtml(c.name) + ' — 期限：' + formatDate(nextReviewDue(c.icpDate)) + '</li>';
         });
         html += '</ul>';
       }
       if (dueList.length) {
         html += '<strong style="display:block;margin-top:0.35rem;">📋 一個月內須覆核（' + dueList.length + '）</strong><ul>';
         dueList.forEach(function (c) {
-          html += '<li>' + escapeHtml(c.name) + ' — 期限：' + formatDate(nextReviewDue(caseIcpDate(c))) + '</li>';
+          html += '<li>' + escapeHtml(c.name) + ' — 期限：' + formatDate(nextReviewDue(c.icpDate)) + '</li>';
         });
         html += '</ul>';
       }
@@ -1882,55 +1839,6 @@ function addYears(dateStr, years) {
     }
 
 
-
-    function applyView(view) {
-      currentView = (view === 'pt') ? 'pt' : 'ot';
-      try { localStorage.setItem(VIEW_KEY, currentView); } catch (e) {}
-      document.body.classList.remove('view-ot', 'view-pt');
-      document.body.classList.add(currentView === 'pt' ? 'view-pt' : 'view-ot');
-      var title = document.getElementById('appTitle');
-      var sub = document.getElementById('appSubtitle');
-      if (currentView === 'pt') {
-        if (title) title.textContent = 'WIHC 物理治療 Case Database';
-        if (sub) sub.textContent = '最高服務量 72 人 · PT 每年 ICP 覆核 · 與 OT 共用個案名單';
-        document.title = 'WIHC 物理治療 Case Database';
-      } else {
-        if (title) title.textContent = 'WIHC 職業治療 Case Database';
-        if (sub) sub.textContent = '最高服務量 72 人 · 每年 ICP 覆核 · 覆核期限前一個月必須完成';
-        document.title = 'WIHC 職業治療 Case Database';
-      }
-      var btns = document.querySelectorAll('#viewSwitch .view-btn');
-      for (var i = 0; i < btns.length; i++) {
-        if (btns[i].getAttribute('data-view') === currentView) btns[i].classList.add('is-on');
-        else btns[i].classList.remove('is-on');
-      }
-      // OT-only required attributes
-      var cog = document.getElementById('cognitive');
-      var ot = document.getElementById('otTraining');
-      var ger = document.getElementById('gerontech');
-      var icp = document.getElementById('icpDate');
-      if (cog) cog.required = currentView === 'ot';
-      if (ot) ot.required = currentView === 'ot';
-      if (ger) ger.required = currentView === 'ot';
-      if (icp) icp.required = currentView === 'ot';
-      expandedCaseId = null;
-      updateTableHead();
-      refreshAll();
-    }
-
-    function updateTableHead() {
-      var head = document.getElementById('caseTableHead');
-      if (!head) return;
-      if (currentView === 'pt') {
-        head.innerHTML = '<tr>' +
-          '<th>姓名</th><th>入會日期</th><th>PT ICP Date</th><th>下次覆核期限</th><th>覆核狀態</th><th>退會年月</th>' +
-          '<th class="no-print">操作</th></tr>';
-      } else {
-        head.innerHTML = '<tr>' +
-          '<th>姓名</th><th>入會日期</th><th>ICP Date</th><th>下次覆核期限</th><th>覆核狀態</th><th>退會年月</th>' +
-          '<th>認知</th><th>OT</th><th>Gerontech</th><th class="no-print">操作</th></tr>';
-      }
-    }
 
     function renderTable() {
       try {
@@ -2036,60 +1944,38 @@ function addYears(dateStr, years) {
           if (!c) continue;
           var cid = c.id || ('tmp' + i);
           var status = getReviewStatus(c);
-          var icpForView = caseIcpDate(c);
-          var due = icpForView ? nextReviewDue(icpForView) : '';
+          var due = nextReviewDue(c.icpDate);
           var dMonthShow = c.dischargedMonth || (c.dischargedAt ? String(c.dischargedAt).slice(0, 7) : '');
-          var isOpen = currentView === 'ot' && expandedCaseId === cid;
+          var isOpen = expandedCaseId === cid;
           var histCount = (c.assessmentHistory && c.assessmentHistory.length) || 0;
-          if (currentView === 'pt') {
-            html += '<tr class="case-main-row" data-id="' + escapeHtml(cid) + '" data-row="main">' +
-              '<td><strong>' + escapeHtml(c.name || '') + '</strong></td>' +
-              '<td>' + formatDate(c.admissionDate) + '</td>' +
-              '<td>' + formatDate(c.ptIcpDate) + '</td>' +
-              '<td>' + (isActive(c) && due ? formatDate(due) : '—') + '</td>' +
-              '<td>' + statusLabel(status) + '</td>' +
-              '<td>' + (isActive(c) ? '—' : formatDischargeMonth(dMonthShow)) + '</td>' +
-              '<td class="no-print" style="white-space:nowrap;">' +
-                (isActive(c)
-                  ? '<button type="button" class="btn-success btn-sm" data-act="review" data-id="' + escapeHtml(cid) + '">PT 覆核</button> ' +
-                    '<button type="button" class="btn-secondary btn-sm" data-act="edit" data-id="' + escapeHtml(cid) + '">編輯</button> ' +
-                    '<button type="button" class="btn-warning btn-sm" data-act="withdraw" data-id="' + escapeHtml(cid) + '">退會</button> ' +
-                    '<button type="button" class="btn-danger btn-sm" data-act="delete" data-id="' + escapeHtml(cid) + '">刪除</button>'
-                  : '<button type="button" class="btn-primary btn-sm" data-act="reactivate" data-id="' + escapeHtml(cid) + '">重新入會</button> ' +
-                    '<button type="button" class="btn-secondary btn-sm" data-act="edit" data-id="' + escapeHtml(cid) + '">編輯</button> ' +
-                    '<button type="button" class="btn-danger btn-sm" data-act="delete" data-id="' + escapeHtml(cid) + '">刪除</button>'
-                ) +
-              '</td></tr>';
-          } else {
-            html += '<tr class="case-main-row' + (isOpen ? ' is-open' : '') + '" data-id="' + escapeHtml(cid) + '" data-row="main">' +
-              '<td><strong>' + escapeHtml(c.name || '') + '</strong>' +
-                (histCount ? ' <span style="font-size:0.7rem;color:var(--muted);">(' + histCount + ' 次評估)</span>' : '') +
-              '</td>' +
-              '<td>' + formatDate(c.admissionDate) + '</td>' +
-              '<td>' + formatDate(c.icpDate) + '</td>' +
-              '<td>' + (isActive(c) ? formatDate(due) : '—') + '</td>' +
-              '<td>' + statusLabel(status) + '</td>' +
-              '<td>' + (isActive(c) ? '—' : formatDischargeMonth(dMonthShow)) + '</td>' +
-              '<td>' + cogBadge(c.cognitive) + '</td>' +
-              '<td>' + ynBadge(c.otTraining) + '</td>' +
-              '<td>' + ynBadge(c.gerontech) + '</td>' +
-              '<td class="no-print" style="white-space:nowrap;">' +
-                (isActive(c)
-                  ? '<button type="button" class="btn-success btn-sm" data-act="review" data-id="' + escapeHtml(cid) + '">覆核</button> ' +
-                    '<button type="button" class="btn-primary btn-sm" data-act="detail" data-id="' + escapeHtml(cid) + '">評估詳情</button> ' +
-                    '<button type="button" class="btn-secondary btn-sm" data-act="edit" data-id="' + escapeHtml(cid) + '">編輯</button> ' +
-                    '<button type="button" class="btn-warning btn-sm" data-act="withdraw" data-id="' + escapeHtml(cid) + '">退會</button> ' +
-                    '<button type="button" class="btn-danger btn-sm" data-act="delete" data-id="' + escapeHtml(cid) + '">刪除</button>'
-                  : '<button type="button" class="btn-primary btn-sm" data-act="detail" data-id="' + escapeHtml(cid) + '">評估詳情</button> ' +
-                    '<button type="button" class="btn-primary btn-sm" data-act="reactivate" data-id="' + escapeHtml(cid) + '">重新入會</button> ' +
-                    '<button type="button" class="btn-secondary btn-sm" data-act="edit" data-id="' + escapeHtml(cid) + '">編輯</button> ' +
-                    '<button type="button" class="btn-danger btn-sm" data-act="delete" data-id="' + escapeHtml(cid) + '">刪除</button>'
-                ) +
-              '</td></tr>';
-            if (isOpen) {
-              html += '<tr class="case-detail-row" data-id="' + escapeHtml(cid) + '" data-row="detail">' +
-                '<td colspan="10">' + buildDetailPanelHtml(c) + '</td></tr>';
-            }
+          html += '<tr class="case-main-row' + (isOpen ? ' is-open' : '') + '" data-id="' + escapeHtml(cid) + '" data-row="main">' +
+            '<td><strong>' + escapeHtml(c.name || '') + '</strong>' +
+              (histCount ? ' <span style="font-size:0.7rem;color:var(--muted);">(' + histCount + ' 次評估)</span>' : '') +
+            '</td>' +
+            '<td>' + formatDate(c.admissionDate) + '</td>' +
+            '<td>' + formatDate(c.icpDate) + '</td>' +
+            '<td>' + (isActive(c) ? formatDate(due) : '—') + '</td>' +
+            '<td>' + statusLabel(status) + '</td>' +
+            '<td>' + (isActive(c) ? '—' : formatDischargeMonth(dMonthShow)) + '</td>' +
+            '<td>' + cogBadge(c.cognitive) + '</td>' +
+            '<td>' + ynBadge(c.otTraining) + '</td>' +
+            '<td>' + ynBadge(c.gerontech) + '</td>' +
+            '<td class="no-print" style="white-space:nowrap;">' +
+              (isActive(c)
+                ? '<button type="button" class="btn-success btn-sm" data-act="review" data-id="' + escapeHtml(cid) + '">覆核</button> ' +
+                  '<button type="button" class="btn-primary btn-sm" data-act="detail" data-id="' + escapeHtml(cid) + '">評估詳情</button> ' +
+                  '<button type="button" class="btn-secondary btn-sm" data-act="edit" data-id="' + escapeHtml(cid) + '">編輯</button> ' +
+                  '<button type="button" class="btn-warning btn-sm" data-act="withdraw" data-id="' + escapeHtml(cid) + '">退會</button> ' +
+                  '<button type="button" class="btn-danger btn-sm" data-act="delete" data-id="' + escapeHtml(cid) + '">刪除</button>'
+                : '<button type="button" class="btn-primary btn-sm" data-act="detail" data-id="' + escapeHtml(cid) + '">評估詳情</button> ' +
+                  '<button type="button" class="btn-primary btn-sm" data-act="reactivate" data-id="' + escapeHtml(cid) + '">重新入會</button> ' +
+                  '<button type="button" class="btn-secondary btn-sm" data-act="edit" data-id="' + escapeHtml(cid) + '">編輯</button> ' +
+                  '<button type="button" class="btn-danger btn-sm" data-act="delete" data-id="' + escapeHtml(cid) + '">刪除</button>'
+              ) +
+            '</td></tr>';
+          if (isOpen) {
+            html += '<tr class="case-detail-row" data-id="' + escapeHtml(cid) + '" data-row="detail">' +
+              '<td colspan="10">' + buildDetailPanelHtml(c) + '</td></tr>';
           }
         }
         tbody.innerHTML = html;
@@ -2427,7 +2313,7 @@ function addYears(dateStr, years) {
       var currentYM = today.toISOString().slice(0, 7);
 
       active.forEach(function (c) {
-        var due = nextReviewDue(caseIcpDate(c));
+        var due = nextReviewDue(c.icpDate);
         var key = monthKey(due);
         if (!key) return;
         if (!groups[key]) groups[key] = { cases: [], hasOverdue: false, hasDue: false };
@@ -3035,21 +2921,10 @@ function addYears(dateStr, years) {
       } catch (e) {}
     }, 1500);
 
-    document.getElementById('viewSwitch').addEventListener('click', function (e) {
-      var btn = e.target.closest('.view-btn');
-      if (!btn) return;
-      applyView(btn.getAttribute('data-view'));
-    });
-
     (async function init() {
-      var savedView = 'ot';
-      try { savedView = localStorage.getItem(VIEW_KEY) || 'ot'; } catch (e) {}
       currentStatusFilter = 'all';
       currentLetterFilter = '';
       buildAlphaFilters();
-      document.body.classList.add(savedView === 'pt' ? 'view-pt' : 'view-ot');
-      currentView = savedView === 'pt' ? 'pt' : 'ot';
-      // applyView does refresh; defer full apply after loadLocal
 
       clearCaseSearchBox();
       // Clear again shortly after load (some browsers autofill late)
@@ -3057,13 +2932,12 @@ function addYears(dateStr, years) {
       setTimeout(function () { clearCaseSearchBox(); renderTable(); }, 500);
       setTimeout(function () { clearCaseSearchBox(); renderTable(); }, 1500);
       loadLocal();
-      applyView(currentView);
+      refreshAll();
       setStatusFilter('all');
       if (getToken()) {
         await pullFromGitHub();
         currentStatusFilter = 'all';
         setStatusFilter('all');
-        applyView(currentView);
       } else {
         updateSyncUI('local', '本機模式');
       }
