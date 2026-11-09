@@ -888,13 +888,13 @@
       "icpDate": "2026-02-25",
       "cognitive": "Major NCD",
       "otTraining": "Yes",
-      "gerontech": "No",
+      "gerontech": "Yes",
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
       "assessmentHistory": [],
       "createdAt": "2026-08-31T08:41:47.682Z",
-      "updatedAt": "2026-08-31T08:41:47.682Z"
+      "updatedAt": "2026-11-09T02:14:08.432Z"
     },
     {
       "id": "mtgzpyclck1zxz",
