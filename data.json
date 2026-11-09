@@ -1429,12 +1429,12 @@
       "cognitive": "Normal",
       "otTraining": "No",
       "gerontech": "No",
-      "status": "active",
-      "dischargedAt": null,
-      "dischargedMonth": null,
+      "status": "discharged",
+      "dischargedAt": "2026-11-01",
+      "dischargedMonth": "2026-11",
       "assessmentHistory": [],
       "createdAt": "2026-10-08T05:40:01.694Z",
-      "updatedAt": "2026-10-08T05:40:01.694Z"
+      "updatedAt": "2026-11-09T01:11:59.755Z"
     },
     {
       "id": "muzay16096uxg8",
