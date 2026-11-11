@@ -553,10 +553,21 @@
           "mbiScore": 43,
           "lawtonScore": null,
           "notes": ""
+        },
+        {
+          "id": "mwbxdkeze1ftaw",
+          "date": "2026-09-29",
+          "previousIcpDate": "2026-09-29",
+          "icpDate": "2026-09-29",
+          "cognitiveTool": "CDR",
+          "cognitiveScore": 3,
+          "mbiScore": 39,
+          "lawtonScore": null,
+          "notes": ""
         }
       ],
       "createdAt": "2026-08-31T08:20:45.676Z",
-      "updatedAt": "2026-11-11T09:34:08.184Z"
+      "updatedAt": "2026-11-11T09:37:13.115Z"
     },
     {
       "id": "mtgyz3afa4mbze",
