@@ -840,16 +840,28 @@
       "id": "mtgzm4ir68mxeu",
       "name": "W碧娥",
       "admissionDate": "2023-12-21",
-      "icpDate": "2025-12-05",
+      "icpDate": "2026-11-11",
       "cognitive": "Normal",
       "otTraining": "Yes",
       "gerontech": "No",
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
-      "assessmentHistory": [],
+      "assessmentHistory": [
+        {
+          "id": "mwbwzqt4retnz6",
+          "date": "2026-11-11",
+          "previousIcpDate": "2025-12-05",
+          "icpDate": "2026-11-11",
+          "cognitiveTool": "AMT",
+          "cognitiveScore": 10,
+          "mbiScore": 90,
+          "lawtonScore": null,
+          "notes": ""
+        }
+      ],
       "createdAt": "2026-08-31T08:39:35.523Z",
-      "updatedAt": "2026-08-31T08:39:35.523Z"
+      "updatedAt": "2026-11-11T09:26:28.216Z"
     },
     {
       "id": "mtgzmwz5jh54ry",
