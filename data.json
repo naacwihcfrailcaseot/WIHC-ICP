@@ -1576,9 +1576,21 @@
       "otTraining": "No",
       "gerontech": "No",
       "status": "active",
-      "assessmentHistory": [],
+      "assessmentHistory": [
+        {
+          "id": "mwd7ruztizi1qp",
+          "date": "2026-11-12",
+          "previousIcpDate": "2026-11-12",
+          "icpDate": "2026-11-12",
+          "cognitiveTool": "HKMoCA-5min",
+          "cognitiveScore": 25,
+          "mbiScore": 86,
+          "lawtonScore": 28,
+          "notes": "intake"
+        }
+      ],
       "createdAt": "2026-11-12T07:07:51.216Z",
-      "updatedAt": "2026-11-12T07:07:51.216Z"
+      "updatedAt": "2026-11-12T07:16:02.345Z"
     }
   ],
   "devices": [
