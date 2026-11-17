@@ -1357,9 +1357,32 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
-      "assessmentHistory": [],
+      "assessmentHistory": [
+        {
+          "id": "mwkh938c2zdxds",
+          "date": "2025-03-19",
+          "previousIcpDate": "2026-03-11",
+          "icpDate": "2026-03-11",
+          "cognitiveTool": "HKMoCA-5min",
+          "cognitiveScore": 5,
+          "mbiScore": 86,
+          "lawtonScore": null,
+          "notes": ""
+        },
+        {
+          "id": "mwkh81o9kr7zk1",
+          "date": "2026-03-11",
+          "previousIcpDate": "2026-03-11",
+          "icpDate": "2026-03-11",
+          "cognitiveTool": "HKMoCA-5min",
+          "cognitiveScore": 5,
+          "mbiScore": 71,
+          "lawtonScore": null,
+          "notes": ""
+        }
+      ],
       "createdAt": "2026-08-31T08:32:33.347Z",
-      "updatedAt": "2026-08-31T08:32:33.347Z"
+      "updatedAt": "2026-11-17T09:15:45.948Z"
     },
     {
       "id": "mtgzeqc8inx3kh",
