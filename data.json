@@ -439,6 +439,17 @@
       "dischargedMonth": null,
       "assessmentHistory": [
         {
+          "id": "mwkecybp2tcu3r",
+          "date": "2023-10-12",
+          "previousIcpDate": "2026-10-23",
+          "icpDate": "2026-10-23",
+          "cognitiveTool": "HKMoCA-full",
+          "cognitiveScore": 15,
+          "mbiScore": 86,
+          "lawtonScore": null,
+          "notes": ""
+        },
+        {
           "id": "mwkeb3foqmjgzh",
           "date": "2024-10-18",
           "previousIcpDate": "2026-10-23",
@@ -473,7 +484,7 @@
         }
       ],
       "createdAt": "2026-08-31T08:17:31.406Z",
-      "updatedAt": "2026-11-17T07:53:20.676Z"
+      "updatedAt": "2026-11-17T07:54:47.365Z"
     },
     {
       "id": "mtgyv0e6yizx6a",
