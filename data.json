@@ -868,9 +868,21 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
-      "assessmentHistory": [],
+      "assessmentHistory": [
+        {
+          "id": "mwkffv9vbsudil",
+          "date": "2026-03-30",
+          "previousIcpDate": "2026-03-30",
+          "icpDate": "2026-03-30",
+          "cognitiveTool": "HKMoCA-full",
+          "cognitiveScore": 23,
+          "mbiScore": 100,
+          "lawtonScore": null,
+          "notes": ""
+        }
+      ],
       "createdAt": "2026-08-31T08:23:45.853Z",
-      "updatedAt": "2026-08-31T08:23:45.853Z"
+      "updatedAt": "2026-11-17T08:25:02.995Z"
     },
     {
       "id": "mtgz30ot356xxs",
