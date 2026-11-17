@@ -930,6 +930,17 @@
       "dischargedMonth": null,
       "assessmentHistory": [
         {
+          "id": "mwkgdca3157ukh",
+          "date": "2025-04-11",
+          "previousIcpDate": "2026-03-27",
+          "icpDate": "2026-03-27",
+          "cognitiveTool": "N/A",
+          "cognitiveScore": null,
+          "mbiScore": 76,
+          "lawtonScore": null,
+          "notes": ""
+        },
+        {
           "id": "mwkgcgxlz38ch5",
           "date": "2026-03-27",
           "previousIcpDate": "2026-03-27",
@@ -942,7 +953,7 @@
         }
       ],
       "createdAt": "2026-08-31T08:24:44.093Z",
-      "updatedAt": "2026-11-17T08:50:24.057Z"
+      "updatedAt": "2026-11-17T08:51:04.683Z"
     },
     {
       "id": "mtgz43vi5kc95l",
@@ -955,9 +966,21 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
-      "assessmentHistory": [],
+      "assessmentHistory": [
+        {
+          "id": "mwkgfan3xl9tyv",
+          "date": "2026-04-16",
+          "previousIcpDate": "2026-04-16",
+          "icpDate": "2026-04-16",
+          "cognitiveTool": "HKMoCA-5min",
+          "cognitiveScore": 26,
+          "mbiScore": 100,
+          "lawtonScore": null,
+          "notes": ""
+        }
+      ],
       "createdAt": "2026-08-31T08:25:34.878Z",
-      "updatedAt": "2026-08-31T08:25:34.878Z"
+      "updatedAt": "2026-11-17T08:52:35.871Z"
     },
     {
       "id": "mtgz51iaq169tj",
