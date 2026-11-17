@@ -660,6 +660,17 @@
       "dischargedMonth": null,
       "assessmentHistory": [
         {
+          "id": "mwkesqusu8gc9c",
+          "date": "2025-10-16",
+          "previousIcpDate": "2026-10-07",
+          "icpDate": "2026-10-07",
+          "cognitiveTool": "AMT",
+          "cognitiveScore": 10,
+          "mbiScore": 92,
+          "lawtonScore": null,
+          "notes": ""
+        },
+        {
           "id": "mwkeragbq00ls9",
           "date": "2026-10-07",
           "previousIcpDate": "2026-10-07",
@@ -672,7 +683,7 @@
         }
       ],
       "createdAt": "2026-08-31T08:21:40.839Z",
-      "updatedAt": "2026-11-17T08:05:56.267Z"
+      "updatedAt": "2026-11-17T08:07:04.180Z"
     },
     {
       "id": "mtgz0a4cdf53bd",
