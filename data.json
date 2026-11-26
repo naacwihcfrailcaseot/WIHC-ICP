@@ -1890,9 +1890,21 @@
       "status": "active",
       "dischargedAt": null,
       "dischargedMonth": null,
-      "assessmentHistory": [],
+      "assessmentHistory": [
+        {
+          "id": "mwwuz2f4v664ff",
+          "date": "2025-12-04",
+          "previousIcpDate": "2025-12-04",
+          "icpDate": "2025-12-04",
+          "cognitiveTool": "HKMoCA-5min",
+          "cognitiveScore": 29,
+          "mbiScore": 98,
+          "lawtonScore": 45,
+          "notes": ""
+        }
+      ],
       "createdAt": "2026-08-31T08:54:26.098Z",
-      "updatedAt": "2026-08-31T08:54:26.098Z"
+      "updatedAt": "2026-11-26T01:13:07.072Z"
     },
     {
       "id": "mth0636bwg7dzk",
