@@ -1883,7 +1883,7 @@
       "id": "mth057oymrt9go",
       "name": "M素廉",
       "admissionDate": "2025-12-04",
-      "icpDate": "2025-12-04",
+      "icpDate": "2026-11-25",
       "cognitive": "Normal",
       "otTraining": "No",
       "gerontech": "No",
@@ -1901,10 +1901,21 @@
           "mbiScore": 98,
           "lawtonScore": 45,
           "notes": ""
+        },
+        {
+          "id": "mwwv6sj1gga12i",
+          "date": "2026-11-25",
+          "previousIcpDate": "2025-12-04",
+          "icpDate": "2026-11-25",
+          "cognitiveTool": "HKMoCA-5min",
+          "cognitiveScore": 24,
+          "mbiScore": 98,
+          "lawtonScore": 40,
+          "notes": ""
         }
       ],
       "createdAt": "2026-08-31T08:54:26.098Z",
-      "updatedAt": "2026-11-26T01:13:07.072Z"
+      "updatedAt": "2026-11-26T01:19:07.501Z"
     },
     {
       "id": "mth0636bwg7dzk",
