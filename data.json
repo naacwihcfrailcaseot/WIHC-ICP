@@ -2282,12 +2282,12 @@
       "cognitive": "MCI",
       "otTraining": "Yes",
       "gerontech": "No",
-      "status": "active",
-      "dischargedAt": null,
-      "dischargedMonth": null,
+      "status": "discharged",
+      "dischargedAt": "2026-11-01",
+      "dischargedMonth": "2026-11",
       "assessmentHistory": [],
       "createdAt": "2026-11-16T07:16:27.535Z",
-      "updatedAt": "2026-11-16T07:16:27.535Z"
+      "updatedAt": "2026-11-28T09:28:06.655Z"
     }
   ],
   "devices": [
